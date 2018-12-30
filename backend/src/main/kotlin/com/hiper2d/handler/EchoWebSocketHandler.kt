@@ -15,11 +15,11 @@ import kotlin.random.Random
 @Component
 class EchoWebSocketHandler: WebSocketHandler {
 
-    override fun handle(session: WebSocketSession): Mono<Void> {
-        val processor = EmitterProcessor.create<String>(false)
-        val outputEvents = Flux.from(processor)
-        val mapper = ObjectMapper().registerKotlinModule()
+    private val processor = EmitterProcessor.create<String>(false)
+    private val outputEvents = Flux.from(processor)
+    private val mapper = ObjectMapper().registerKotlinModule()
 
+    override fun handle(session: WebSocketSession): Mono<Void> {
         val input = session.receive()
             .doOnNext {
                 val json = it.payloadAsText
