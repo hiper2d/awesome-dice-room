@@ -8,8 +8,6 @@ import org.springframework.web.reactive.HandlerMapping
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter
 
-data class WsRequest(val message: String, val uuid: String)
-
 @Configuration
 class WebSocketConfig(val echoWebSocketHandler: EchoWebSocketHandler) {
 
