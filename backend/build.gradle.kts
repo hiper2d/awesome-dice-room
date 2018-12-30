@@ -15,6 +15,7 @@ plugins {
 val activationVersion: String by project
 val disruptorVersion: String by project
 val jaxbVersion: String by project
+val kotlinJacksonVersion: String by project
 
 repositories {
     jcenter()
@@ -22,6 +23,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-webflux")

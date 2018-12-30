@@ -15,7 +15,7 @@ export class AppComponent implements OnInit {
     this.uuid = this.createUuid();
     this.wsConnection = new WebSocket(`ws://${window.location.hostname}:8080/ws/echo`);
     this.wsConnection.onmessage = this.getWsMessageCallback();
-    this.wsConnection.onopen = () => this.wsConnection.send(JSON.stringify({ message: 'hi', uuid: this.uuid }));
+    this.wsConnection.onopen = () => this.wsConnection.send(JSON.stringify({ message: '1d6', uuid: this.uuid }));
   }
 
   private getWsMessageCallback(): (string) => void {
