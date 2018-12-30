@@ -15,16 +15,19 @@ export class AppComponent implements OnInit {
     this.uuid = this.createUuid();
     this.wsConnection = new WebSocket(`ws://${window.location.hostname}:8080/ws/echo`);
     this.wsConnection.onmessage = this.getWsMessageCallback();
-    this.wsConnection.onopen = () => this.wsConnection.send(JSON.stringify({ message: '1d6', uuid: this.uuid }));
+  }
+
+  roll() {
+    this.wsConnection.send(JSON.stringify({ message: '1d6', uuid: this.uuid }));
   }
 
   private getWsMessageCallback(): (string) => void {
     return (message) => {
       const signal = JSON.parse(message.data);
-      if (signal.uuid === this.uuid) {
+      /*if (signal.uuid === this.uuid) {
         console.log('Received self signal');
         return;
-      }
+      }*/
 
       console.log('Received signal');
       console.log(signal);
