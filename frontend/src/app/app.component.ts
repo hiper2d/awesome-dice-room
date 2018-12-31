@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostBinding, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -6,7 +6,8 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'dice-room-frontend';
+
+  num: number;
 
   private wsConnection: WebSocket;
   private uuid: string;
@@ -28,9 +29,7 @@ export class AppComponent implements OnInit {
         console.log('Received self signal');
         return;
       }*/
-
-      console.log('Received signal');
-      console.log(signal);
+      this.num = signal;
     };
   }
 
