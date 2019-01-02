@@ -1,2 +1,7 @@
-<button mat-raised-button color="accent" (click)="roll()">Click me!</button>
-<div *ngIf="num">{{ num }}</div>
+<div class="screen top">
+    <button mat-flat-button color="accent" (click)="roll()">Click me!</button>
+</div>
+
+<div class="screen bottom">
+    <div *ngIf="num">{{ num }}</div>
+</div>

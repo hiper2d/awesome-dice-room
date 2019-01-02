@@ -1,1 +1,14 @@
-@import '~@angular/material/prebuilt-themes/purple-green.css';
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+@mixin height() {
+  height: 100%;
+  min-height: 100%;
+}
+
+html {
+  @include height()
+}
+
+body {
+  @include height()
+}

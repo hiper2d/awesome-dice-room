@@ -1,0 +1,17 @@
+:host {
+  min-height: 100%;
+}
+
+.screen {
+  box-sizing: border-box;
+  height: 50%;
+  padding: 20px;
+
+  &.top {
+    background-color: deepskyblue;
+  }
+
+  &.bottom {
+    background-color: lightpink;
+  }
+}

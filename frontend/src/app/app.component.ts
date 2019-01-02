@@ -1,4 +1,5 @@
 import {Component, HostBinding, OnInit} from '@angular/core';
+import {WebSocketService} from './service/websocket.service';
 
 @Component({
   selector: 'app-root',
@@ -12,10 +13,12 @@ export class AppComponent implements OnInit {
   private wsConnection: WebSocket;
   private uuid: string;
 
+  constructor(public webSocketService: WebSocketService) {
+  }
+
   ngOnInit(): void {
     this.uuid = this.createUuid();
-    this.wsConnection = new WebSocket(`ws://${window.location.hostname}:8080/ws/echo`);
-    this.wsConnection.onmessage = this.getWsMessageCallback();
+    this.wsConnection = this.webSocketService.connect(this.getWsMessageCallback());
   }
 
   roll() {
