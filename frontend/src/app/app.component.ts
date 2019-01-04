@@ -1,5 +1,5 @@
 import {Component, HostBinding, OnInit} from '@angular/core';
-import {WebSocketService} from './service/websocket.service';
+import {WebSocketService} from './core/service/websocket.service';
 
 @Component({
   selector: 'app-root',

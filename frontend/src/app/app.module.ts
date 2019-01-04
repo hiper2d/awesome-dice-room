@@ -2,15 +2,25 @@ import {NgModule} from '@angular/core';
 
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MaterialModule} from './shared/material.module';
+import {AppRoutingModule} from './app-routing.module';
+import {RoomModule} from './room/room.module';
+import {DashboardModule} from './dashboard/dashboard.module';
+import {CoreModule} from './core/core.module';
+import {BrowserModule} from '@angular/platform-browser';
+import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    PageNotFoundComponent,
   ],
   imports: [
+    BrowserModule,
     BrowserAnimationsModule,
-    MaterialModule
+    CoreModule,
+    DashboardModule,
+    RoomModule,
+    AppRoutingModule, // should be the last because of routing
   ],
   providers: [],
   bootstrap: [AppComponent]
