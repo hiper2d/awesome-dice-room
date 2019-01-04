@@ -8,7 +8,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { useHash: true })
+    RouterModule.forRoot(routes, { useHash: false }) // set to false temporary
   ],
   exports: [
     RouterModule
