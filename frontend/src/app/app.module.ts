@@ -6,6 +6,7 @@ import {RoomModule} from './room/room.module';
 import {DashboardModule} from './dashboard/dashboard.module';
 import {CoreModule} from './core/core.module';
 import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
+import {BrowserModule} from '@angular/platform-browser';
 
 @NgModule({
   declarations: [
@@ -13,6 +14,7 @@ import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
     PageNotFoundComponent,
   ],
   imports: [
+    BrowserModule,
     BrowserAnimationsModule,
     CoreModule,
     DashboardModule,
