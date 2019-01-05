@@ -10,5 +10,7 @@ html {
 }
 
 body {
-  @include height()
+  @include height();
+
+  background-color: lightpink;
 }

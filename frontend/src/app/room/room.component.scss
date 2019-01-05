@@ -2,17 +2,13 @@
   min-height: 100%;
 }
 
-.screen {
+.play-area {
   box-sizing: border-box;
   height: 50%;
   padding: 20px;
 
   &.top {
     background-color: deepskyblue;
-  }
-
-  &.bottom {
-    background-color: lightpink;
   }
 
   .tab-body {
