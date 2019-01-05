@@ -1,15 +1,17 @@
 import {NgModule} from '@angular/core';
-import {MatButtonModule, MatTabsModule} from '@angular/material';
+import {MatButtonModule, MatCheckboxModule, MatTabsModule} from '@angular/material';
 
 @NgModule({
   imports: [
     MatButtonModule,
+    MatCheckboxModule,
     MatTabsModule
   ],
   declarations: [
   ],
   exports: [
     MatButtonModule,
+    MatCheckboxModule,
     MatTabsModule
   ]
 })

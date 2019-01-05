@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {WebSocketService} from '../core/service/websocket.service';
+import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 
 @Component({
   selector: 'app-room',
@@ -8,12 +9,21 @@ import {WebSocketService} from '../core/service/websocket.service';
 })
 export class RoomComponent implements OnInit {
 
-  num: number;
+  num: string;
+  diceFormGroup: FormGroup;
 
   private wsConnection: WebSocket;
   private uuid: string;
 
-  constructor(public webSocketService: WebSocketService) {
+  constructor(
+    fb: FormBuilder,
+    public webSocketService: WebSocketService
+  ) {
+    this.diceFormGroup = fb.group({
+      dice: fb.array([
+        false, true, false
+      ])
+    });
   }
 
   ngOnInit(): void {
@@ -21,18 +31,28 @@ export class RoomComponent implements OnInit {
     this.wsConnection = this.webSocketService.connect(this.getWsMessageCallback());
   }
 
+  get dice(): FormArray {
+    return this.diceFormGroup.get('dice') as FormArray;
+  }
+
+  addDie() {
+    this.dice.push(new FormControl(true));
+  }
+
   roll() {
-    this.wsConnection.send(JSON.stringify({ message: '1d6', uuid: this.uuid }));
+    const diceValues = this.dice.getRawValue().filter(v => !!v).map(_ => 'd6').join(';');
+    console.log(diceValues);
+    this.wsConnection.send(JSON.stringify({ type: 'roll', data: diceValues, uuid: this.uuid }));
   }
 
   private getWsMessageCallback(): (string) => void {
     return (message) => {
-      const signal = JSON.parse(message.data);
-      /*if (signal.uuid === this.uuid) {
+      /*const signal = JSON.parse(message.data);
+      if (signal.uuid === this.uuid) {
         console.log('Received self signal');
         return;
       }*/
-      this.num = signal;
+      this.num = message.data;
     };
   }
 

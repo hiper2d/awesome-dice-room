@@ -11,7 +11,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import kotlin.random.Random
 
-internal data class InputMessage(val message: String, val uuid: String)
+internal data class InputMessage(val type: String, val data: String, val uuid: String)
 
 @Component
 class EchoWebSocketHandler: WebSocketHandler {
@@ -24,9 +24,14 @@ class EchoWebSocketHandler: WebSocketHandler {
         val input = session.receive()
             .doOnNext {
                 val json = it.payloadAsText
-                val inputMessage = mapper.readValue<InputMessage>(json)
-                if (inputMessage.message == "1d6") {
-                    processor.onNext(Random.nextInt(1, 6).toString())
+                val message = mapper.readValue<InputMessage>(json)
+                if (message.type == "roll") {
+                    val data = message.data
+                        .split(";")
+                        .joinToString(";") {
+                            Random.nextInt(1, 6).toString()
+                        }
+                    processor.onNext(data)
                 }
             }
             .then()

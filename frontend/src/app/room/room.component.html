@@ -1,20 +1,24 @@
 <div class="play-area top">
-  <div *ngIf="num">{{ num }}</div>
+  <span *ngIf="num">{{ num }}</span>
 </div>
 
 <div class="play-area">
   <mat-tab-group dynamicHeight>
-    <mat-tab label="First">
+    <mat-tab label="Player One">
       <div class="tab-body">
-        <button mat-flat-button color="accent" (click)="roll()">d6</button>
+        <form [formGroup]="diceFormGroup">
+          <button mat-flat-button color="accent" (click)="addDie()">Add d6</button>
+          <button mat-flat-button color="accent" (click)="roll()">Roll</button>
+          <mat-checkbox *ngFor="let die of dice.controls" [formControl]="die">d6</mat-checkbox>
+        </form>
       </div>
     </mat-tab>
-    <mat-tab label="Second">
+    <mat-tab label="Player Two">
       <div class="tab-body">
         Content 2
       </div>
     </mat-tab>
-    <mat-tab label="Third">
+    <mat-tab label="Player Three">
       <div class="tab-body">
         Content 3
       </div>

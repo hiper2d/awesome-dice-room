@@ -9,8 +9,14 @@
 
   &.top {
     background-color: deepskyblue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .tab-body {
+    form * {
+      margin: 5px;
+    }
   }
 }
