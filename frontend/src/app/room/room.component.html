@@ -9,7 +9,7 @@
         <form [formGroup]="diceFormGroup">
           <button mat-flat-button color="accent" (click)="addDie()">Add d6</button>
           <button mat-flat-button color="accent" (click)="roll()">Roll</button>
-          <mat-checkbox *ngFor="let die of dice.controls" [formControl]="die">d6</mat-checkbox>
+          <app-die *ngFor="let die of dice.controls" [formControl]="die"></app-die>
         </form>
       </div>
     </mat-tab>

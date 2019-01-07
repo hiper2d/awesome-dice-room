@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {WebSocketService} from '../core/service/websocket.service';
 import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {DieModel} from '../model/die.model';
 
 @Component({
   selector: 'app-room',
@@ -12,6 +13,8 @@ export class RoomComponent implements OnInit {
   num: string;
   diceFormGroup: FormGroup;
 
+  private readonly diceValues: Array<DieModel>; // rename me
+
   private wsConnection: WebSocket;
   private uuid: string;
 
@@ -19,10 +22,14 @@ export class RoomComponent implements OnInit {
     fb: FormBuilder,
     public webSocketService: WebSocketService
   ) {
+    this.diceValues = [
+      new DieModel('d6', 'white', false),
+      new DieModel('d6', 'white', true),
+      new DieModel('d6', 'white', false)
+    ];
+
     this.diceFormGroup = fb.group({
-      dice: fb.array([
-        false, true, false
-      ])
+      dice: fb.array(this.diceValues)
     });
   }
 
@@ -40,7 +47,9 @@ export class RoomComponent implements OnInit {
   }
 
   roll() {
-    const diceValues = this.dice.getRawValue().filter(v => !!v).map(_ => 'd6').join(';');
+    // refactor me
+    console.log(this.dice.getRawValue());
+    const diceValues = this.dice.getRawValue().filter((v: DieModel) => v.selected).map(_ => 'd6').join(';');
     console.log(diceValues);
     this.wsConnection.send(JSON.stringify({ type: 'roll', data: diceValues, uuid: this.uuid }));
   }
