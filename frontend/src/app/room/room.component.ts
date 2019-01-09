@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {WebSocketService} from '../core/service/websocket.service';
 import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {DieModel} from '../model/die.model';
@@ -43,7 +43,12 @@ export class RoomComponent implements OnInit {
   }
 
   addDie() {
-    this.dice.push(new FormControl(true));
+    const newDie = new DieModel('d6', 'white', false);
+    this.dice.push(new FormControl(newDie));
+  }
+
+  removeDie() {
+    this.dice.removeAt(this.dice.length - 1);
   }
 
   roll() {
@@ -51,7 +56,7 @@ export class RoomComponent implements OnInit {
     console.log(this.dice.getRawValue());
     const diceValues = this.dice.getRawValue().filter((v: DieModel) => v.selected).map(_ => 'd6').join(';');
     console.log(diceValues);
-    this.wsConnection.send(JSON.stringify({ type: 'roll', data: diceValues, uuid: this.uuid }));
+    this.wsConnection.send(JSON.stringify({type: 'roll', data: diceValues, uuid: this.uuid}));
   }
 
   private getWsMessageCallback(): (string) => void {

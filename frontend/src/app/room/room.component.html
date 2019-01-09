@@ -7,8 +7,9 @@
     <mat-tab label="Player One">
       <div class="tab-body">
         <form [formGroup]="diceFormGroup">
-          <button mat-flat-button color="accent" (click)="addDie()">Add d6</button>
+          <button mat-flat-button color="accent" (click)="addDie()">Add</button>
           <button mat-flat-button color="accent" (click)="roll()">Roll</button>
+          <button mat-flat-button color="accent" (click)="removeDie()">Del</button>
           <app-die *ngFor="let die of dice.controls" [formControl]="die"></app-die>
         </form>
       </div>
