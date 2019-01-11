@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {WebSocketService} from '../core/service/websocket.service';
 import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {DieModel} from '../model/die.model';
+import {MatDialog} from '@angular/material';
+import {RoomDialogComponent} from './room-dialog/room-dialog.component';
 
 @Component({
   selector: 'app-room',
@@ -20,6 +22,7 @@ export class RoomComponent implements OnInit {
 
   constructor(
     fb: FormBuilder,
+    public dialog: MatDialog,
     public webSocketService: WebSocketService
   ) {
     this.diceValues = [
@@ -34,6 +37,18 @@ export class RoomComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    setTimeout(() => { // todo: hack to avoid 'value has been changed before check'. Need to move the dialog to Dashboard.
+      const dialogRef = this.dialog.open(RoomDialogComponent, {
+        width: '250px',
+        data: { name: 'name', animal: 'animal' }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+        console.log(result);
+      });
+    });
+
     this.uuid = this.createUuid();
     this.wsConnection = this.webSocketService.connect(this.getWsMessageCallback());
   }

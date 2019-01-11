@@ -1,10 +1,12 @@
 import {NgModule} from '@angular/core';
-import {MatButtonModule, MatCheckboxModule, MatTabsModule} from '@angular/material';
+import {MatButtonModule, MatCheckboxModule, MatDialogModule, MatInputModule, MatTabsModule} from '@angular/material';
 
 @NgModule({
   imports: [
     MatButtonModule,
     MatCheckboxModule,
+    MatDialogModule,
+    MatInputModule,
     MatTabsModule
   ],
   declarations: [
@@ -12,6 +14,8 @@ import {MatButtonModule, MatCheckboxModule, MatTabsModule} from '@angular/materi
   exports: [
     MatButtonModule,
     MatCheckboxModule,
+    MatDialogModule,
+    MatInputModule,
     MatTabsModule
   ]
 })

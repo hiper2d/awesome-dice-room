@@ -11,7 +11,7 @@ import {BrowserModule} from '@angular/platform-browser';
 @NgModule({
   declarations: [
     AppComponent,
-    PageNotFoundComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -25,3 +25,4 @@ import {BrowserModule} from '@angular/platform-browser';
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+

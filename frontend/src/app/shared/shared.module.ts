@@ -1,12 +1,13 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MaterialModule} from './material.module';
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DieComponent} from './die/die.component';
 
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     MaterialModule,
     ReactiveFormsModule
   ],
@@ -16,6 +17,7 @@ import {DieComponent} from './die/die.component';
   exports: [
     CommonModule,
     DieComponent,
+    FormsModule,
     MaterialModule,
     ReactiveFormsModule
   ]
