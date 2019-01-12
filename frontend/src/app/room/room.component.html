@@ -5,6 +5,10 @@
 <div class="play-area">
   <mat-tab-group dynamicHeight>
     <mat-tab label="Player One">
+      <ng-template mat-tab-label>
+        <mat-icon class="example-tab-icon">done</mat-icon>
+        First
+      </ng-template>
       <div class="tab-body">
         <form [formGroup]="diceFormGroup">
           <button mat-flat-button color="accent" (click)="addDie()">Add</button>

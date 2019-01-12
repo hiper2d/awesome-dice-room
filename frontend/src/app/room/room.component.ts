@@ -4,6 +4,7 @@ import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {DieModel} from '../model/die.model';
 import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-room',
@@ -22,8 +23,9 @@ export class RoomComponent implements OnInit {
 
   constructor(
     fb: FormBuilder,
-    public dialog: MatDialog,
-    public webSocketService: WebSocketService
+    private router: Router,
+    private dialog: MatDialog,
+    private webSocketService: WebSocketService
   ) {
     this.diceValues = [
       new DieModel('d6', 'white', false),
@@ -44,8 +46,9 @@ export class RoomComponent implements OnInit {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
-        console.log(result);
+        if (!result) {
+          this.router.navigate(['/']);
+        }
       });
     });
 
