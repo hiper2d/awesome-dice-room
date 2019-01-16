@@ -1,10 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {WebSocketService} from '../core/service/websocket.service';
+import {WebSocketUtil} from '../util/web-socket.util';
 import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
 import {DieModel} from '../model/die.model';
 import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
 import {Router} from '@angular/router';
+import {PlayerModel} from '../model/player.model';
 
 @Component({
   selector: 'app-room',
@@ -14,7 +15,8 @@ import {Router} from '@angular/router';
 export class RoomComponent implements OnInit {
 
   num: string;
-  diceFormGroup: FormGroup;
+  diceFormGroup: FormGroup; // todo: move this and other things from here to PlayerSeatComponent
+  players: Array<PlayerModel>;
 
   private readonly diceValues: Array<DieModel>; // rename me
 
@@ -24,8 +26,7 @@ export class RoomComponent implements OnInit {
   constructor(
     fb: FormBuilder,
     private router: Router,
-    private dialog: MatDialog,
-    private webSocketService: WebSocketService
+    private dialog: MatDialog
   ) {
     this.diceValues = [
       new DieModel('d6', 'white', false),
@@ -39,7 +40,7 @@ export class RoomComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    setTimeout(() => { // todo: hack to avoid 'value has been changed before check'. Need to move the dialog to Dashboard.
+    setTimeout(() => { // hack to avoid 'value has been changed before check'
       const dialogRef = this.dialog.open(RoomDialogComponent, {
         width: '250px',
         data: { name: 'name', animal: 'animal' }
@@ -52,8 +53,9 @@ export class RoomComponent implements OnInit {
       });
     });
 
+    this.players = [ new PlayerModel('Kim'), new PlayerModel('Charlie') ]; // todo: take names from RoomDialog
     this.uuid = this.createUuid();
-    this.wsConnection = this.webSocketService.connect(this.getWsMessageCallback());
+    this.wsConnection = WebSocketUtil.connect(this.getWsMessageCallback());
   }
 
   get dice(): FormArray {
@@ -72,7 +74,7 @@ export class RoomComponent implements OnInit {
   roll() {
     // refactor me
     console.log(this.dice.getRawValue());
-    const diceValues = this.dice.getRawValue().filter((v: DieModel) => v.selected).map(_ => 'd6').join(';');
+    const diceValues = this.dice.getRawValue().filter((v: DieModel) => v.selected).map(() => 'd6').join(';');
     console.log(diceValues);
     this.wsConnection.send(JSON.stringify({type: 'roll', data: diceValues, uuid: this.uuid}));
   }
