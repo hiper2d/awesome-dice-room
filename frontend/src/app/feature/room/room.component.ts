@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {WebSocketUtil} from '../util/web-socket.util';
+import {WebSocketUtil} from '../../util/web-socket.util';
 import {FormArray, FormBuilder, FormControl, FormGroup} from '@angular/forms';
-import {DieModel} from '../model/die.model';
+import {DieModel} from '../../model/die.model';
 import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
 import {Router} from '@angular/router';
-import {PlayerModel} from '../model/player.model';
+import {PlayerModel} from '../../model/player.model';
 
 @Component({
   selector: 'app-room',
