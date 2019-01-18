@@ -1,11 +1,5 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-
-export interface DialogData {
-  animal: string;
-  name: string;
-}
-
+import {Component, OnInit} from '@angular/core';
+import {MatDialogRef} from '@angular/material';
 
 @Component({
   selector: 'app-room-dialog',
@@ -14,10 +8,9 @@ export interface DialogData {
 })
 export class RoomDialogComponent implements OnInit {
 
-  constructor(
-    public dialogRef: MatDialogRef<RoomDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData
-  ) {}
+  name: string;
+
+  constructor(public dialogRef: MatDialogRef<RoomDialogComponent>) {}
 
   ngOnInit() {
   }

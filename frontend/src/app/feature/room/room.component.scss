@@ -8,10 +8,18 @@
   padding: 20px;
 
   &.top {
-    background-color: deepskyblue;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  &.bottom {
+    background-color: #393939;
+    color: #fff;
+  }
+
+  .tab-header-text {
+    color: #fff
   }
 
   .tab-body {

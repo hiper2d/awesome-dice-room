@@ -6,6 +6,8 @@ import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
 import {Router} from '@angular/router';
 import {PlayerModel} from '../../model/player.model';
+import {RoomModel} from '../../model/room.model';
+import {UserService} from '../../core/service/user.service';
 
 @Component({
   selector: 'app-room',
@@ -17,6 +19,7 @@ export class RoomComponent implements OnInit {
   num: string;
   diceFormGroup: FormGroup; // todo: move this and other things from here to PlayerSeatComponent
   players: Array<PlayerModel>;
+  room = new RoomModel([]);
 
   private readonly diceValues: Array<DieModel>; // rename me
 
@@ -25,6 +28,7 @@ export class RoomComponent implements OnInit {
 
   constructor(
     fb: FormBuilder,
+    private userService: UserService,
     private router: Router,
     private dialog: MatDialog
   ) {
@@ -42,19 +46,19 @@ export class RoomComponent implements OnInit {
   ngOnInit(): void {
     setTimeout(() => { // hack to avoid 'value has been changed before check'
       const dialogRef = this.dialog.open(RoomDialogComponent, {
-        width: '250px',
-        data: { name: 'name', animal: 'animal' }
+        width: '250px'
       });
 
-      dialogRef.afterClosed().subscribe(result => {
-        if (!result) {
+      dialogRef.afterClosed().subscribe(name => {
+        if (!name) {
           this.router.navigate(['/']);
+        } else {
+          this.room.players.push(new PlayerModel(name, this.userService.userId));
         }
       });
     });
 
-    this.players = [ new PlayerModel('Kim'), new PlayerModel('Charlie') ]; // todo: take names from RoomDialog
-    this.uuid = this.createUuid();
+    this.players = [ new PlayerModel('Kim', 'temp1'), new PlayerModel('Charlie', 'temp2') ]; // todo: remove this
     this.wsConnection = WebSocketUtil.connect(this.getWsMessageCallback());
   }
 
@@ -88,15 +92,5 @@ export class RoomComponent implements OnInit {
       }*/
       this.num = message.data;
     };
-  }
-
-  // Taken from http://stackoverflow.com/a/105074/515584
-  // Strictly speaking, it's not a real UUID, but it gets the job done here
-  private createUuid(): string {
-    function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    }
-
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
   }
 }

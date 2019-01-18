@@ -2,13 +2,13 @@
   <span *ngIf="num">{{ num }}</span>
 </div>
 
-<div class="play-area">
-  <mat-tab-group dynamicHeight>
+<div class="play-area bottom">
+  <mat-tab-group dynamicHeight [color]="'accent'">
     <!-- todo: move this tab to PlayerSeatComponent -->
     <mat-tab label="Player One">
       <ng-template mat-tab-label>
-        <mat-icon class="example-tab-icon">done</mat-icon>
-        First
+        <mat-icon class="example-tab-icon" color="accent">done</mat-icon>
+        <span class="tab-header-text">First</span>
       </ng-template>
       <div class="tab-body">
         <form [formGroup]="diceFormGroup">
