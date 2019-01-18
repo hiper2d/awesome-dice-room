@@ -17,7 +17,7 @@ import {UserService} from '../../core/service/user.service';
 export class RoomComponent implements OnInit {
 
   num: string;
-  diceFormGroup: FormGroup; // todo: move this and other things from here to PlayerSeatComponent
+  diceFormGroup: FormGroup; // move this and other things from here to PlayerSeatComponent
   players: Array<PlayerModel>;
   room = new RoomModel([]);
 
@@ -32,6 +32,7 @@ export class RoomComponent implements OnInit {
     private router: Router,
     private dialog: MatDialog
   ) {
+    // remove this when players handshake be done
     this.diceValues = [
       new DieModel('d6', 'white', false),
       new DieModel('d6', 'white', true),
@@ -54,11 +55,13 @@ export class RoomComponent implements OnInit {
           this.router.navigate(['/']);
         } else {
           this.room.players.push(new PlayerModel(name, this.userService.userId));
+          // todo handshake: send message vid WebSocket to other players that you have joined
         }
       });
     });
 
-    this.players = [ new PlayerModel('Kim', 'temp1'), new PlayerModel('Charlie', 'temp2') ]; // todo: remove this
+    // remove this when players handshake be done, take players from 'room' property
+    this.players = [ new PlayerModel('Kim', 'temp1'), new PlayerModel('Charlie', 'temp2') ];
     this.wsConnection = WebSocketUtil.connect(this.getWsMessageCallback());
   }
 
@@ -67,7 +70,7 @@ export class RoomComponent implements OnInit {
   }
 
   addDie() {
-    const newDie = new DieModel('d6', 'white', false);
+    const newDie = new DieModel('d6', 'white', false); // this should go to separate popup
     this.dice.push(new FormControl(newDie));
   }
 
@@ -76,15 +79,17 @@ export class RoomComponent implements OnInit {
   }
 
   roll() {
-    // refactor me
+    // this should go to popup
     console.log(this.dice.getRawValue());
     const diceValues = this.dice.getRawValue().filter((v: DieModel) => v.selected).map(() => 'd6').join(';');
     console.log(diceValues);
     this.wsConnection.send(JSON.stringify({type: 'roll', data: diceValues, uuid: this.uuid}));
   }
 
+  // need to add message type check to distinguish handshake messages and die rolls
   private getWsMessageCallback(): (string) => void {
     return (message) => {
+      // todo handshake: when got message that new player joined, send him information about you mentioning his uuid
       /*const signal = JSON.parse(message.data);
       if (signal.uuid === this.uuid) {
         console.log('Received self signal');
