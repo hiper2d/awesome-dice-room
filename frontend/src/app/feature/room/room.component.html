@@ -1,26 +1,16 @@
 <div class="play-area top">
-  <span *ngIf="num">{{ num }}</span>
+  <span *ngIf="rollResult">{{ rollResult }}</span>
 </div>
 
 <div class="play-area bottom">
   <mat-tab-group dynamicHeight [color]="'accent'">
-    <!-- todo: move this tab to PlayerSeatComponent -->
-    <!--<mat-tab label="Player One">
-      <ng-template mat-tab-label>
-        <mat-icon class="example-tab-icon" color="accent">done</mat-icon>
-        <span class="tab-header-text">{{ name }}</span>
-      </ng-template>
-      <div class="tab-body">
-        <form [formGroup]="diceFormGroup">
-          <button mat-flat-button color="accent" (click)="addDie()">Add</button>
-          <button mat-flat-button color="accent" (click)="roll()">Roll</button>
-          <button mat-flat-button color="accent" (click)="removeDie()">Del</button>
-          <app-die *ngFor="let die of dice.controls" [formControl]="die"></app-die>
-        </form>
-      </div>
-    </mat-tab>-->
     <mat-tab *ngFor="let player of this.room.players" [label]="player.name">
-      <app-player-seat [player]="player"></app-player-seat>
+        <ng-template mat-tab-label>
+            <span class="tab-header-text">{{ player.name }}</span>
+        </ng-template>
+        <div class="tab-body">
+            <app-player-seat [player]="player" (roll)="rollD6()"></app-player-seat>
+        </div>
     </mat-tab>
   </mat-tab-group>
 </div>

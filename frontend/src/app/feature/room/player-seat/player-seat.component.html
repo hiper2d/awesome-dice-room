@@ -1,3 +1,1 @@
-<div class="tab-body">
-  {{  player.name }}
-</div>
+<button mat-flat-button color="accent" (click)="onRoll()" [disabled]="!player.isItYou">Roll</button>
