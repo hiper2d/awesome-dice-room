@@ -8,6 +8,8 @@ import {Router} from '@angular/router';
 import {PlayerModel} from '../../model/player.model';
 import {RoomModel} from '../../model/room.model';
 import {UserService} from '../../core/service/user.service';
+import {WsMessageModel} from '../../model/ws-message.model';
+import {WsMessageType} from '../../util/ws-message-type';
 
 @Component({
   selector: 'app-room',
@@ -16,7 +18,7 @@ import {UserService} from '../../core/service/user.service';
 })
 export class RoomComponent implements OnInit {
 
-  num: string;
+  num: string; // remove it later
   name: string;
   diceFormGroup: FormGroup; // move this and other things from here to PlayerSeatComponent
   room = new RoomModel([]);
@@ -70,7 +72,11 @@ export class RoomComponent implements OnInit {
   }
 
   notifyOtherClientsThatYouJoined() {
-    this.wsConnection.send(JSON.stringify({type: 'whatsup', data: this.name, uuid: this.userService.userId}));
+    this.wsConnection.send(JSON.stringify(new WsMessageModel({
+      type: WsMessageType.HI_I_AM_NEW_HERE,
+      data: this.name,
+      senderId: this.userService.userId
+    })));
   }
 
   addDie() {
@@ -87,29 +93,41 @@ export class RoomComponent implements OnInit {
     console.log(this.dice.getRawValue());
     const diceValues = this.dice.getRawValue().filter((v: DieModel) => v.selected).map(() => 'd6').join(';');
     console.log(diceValues);
-    this.wsConnection.send(JSON.stringify({type: 'roll', data: diceValues, uuid: this.userService.userId}));
+    this.wsConnection.send(JSON.stringify(new WsMessageModel({
+      type: WsMessageType.ROLL,
+      data: diceValues,
+      senderId: this.userService.userId
+    })));
   }
 
-  // need to add message type check to distinguish handshake messages and die rolls
   private getWsMessageCallback(): (string) => void {
-    return (message) => {
-      const signal = JSON.parse(message.data);
+    return (result) => {
+      const message = JSON.parse(result.data) as WsMessageModel;
 
-      if (signal['type'] === 'dice') {
-        this.num = signal.data;
-      }
+      switch (message.type) {
+        case WsMessageType.ROLL:
+          this.num = message.data;
+          break;
 
-      console.log(signal);
+        case WsMessageType.HI_I_AM_NEW_HERE:
+          if (message.senderId !== this.userService.userId) {
+            this.room.players.push(new PlayerModel(message.data, message.senderId));
+            this.wsConnection.send(
+              JSON.stringify(new WsMessageModel({
+                type: WsMessageType.NICE_TO_MEET_YOU,
+                data: this.name,
+                senderId: this.userService.userId,
+                direct: true,
+                to: message.senderId
+              }))
+            );
+          }
+          break;
 
-      if (signal['type'] === 'whatsup' && signal['uuid'] !== this.userService.userId) {
-        this.room.players.push(new PlayerModel(signal['data'], signal['uuid']));
-        this.wsConnection.send(
-          JSON.stringify({type: 'nicetomeetyou', data: this.name, uuid: this.userService.userId, direct: 'true', to: signal['uuid']})
-        );
-      }
-
-      if (signal['type'] === 'nicetomeetyou' && signal['direct'] && signal['to'] === this.userService.userId) {
-        this.room.players.push(new PlayerModel(signal['data'], signal['uuid']));
+        case WsMessageType.NICE_TO_MEET_YOU:
+          if (message.direct && message.to === this.userService.userId) {
+            this.room.players.push(new PlayerModel(message.data, message.senderId));
+          }
       }
     };
   }
