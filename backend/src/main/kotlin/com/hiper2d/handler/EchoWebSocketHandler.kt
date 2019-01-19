@@ -11,7 +11,14 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import kotlin.random.Random
 
-internal data class WsMessage(val type: String, val data: String = "", val uuid: String = "", val direct: Boolean = false, val to: String = "", val sessionId: String = "")
+internal data class WsMessage(
+    val type: String,
+    val data: String = "",
+    val uuid: String = "",
+    val direct: Boolean = false,
+    val to: String = "",
+    val sessionId: String = ""
+)
 
 @Component
 class EchoWebSocketHandler: WebSocketHandler {
