@@ -11,6 +11,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
   }
 
   &.bottom {
@@ -27,4 +28,13 @@
       margin: 5px;
     }
   }
+}
+
+.chatbox {
+  height: 100%;
+  resize: none;
+}
+
+.message-input {
+  width: 100%;
 }

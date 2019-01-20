@@ -15,8 +15,4 @@ export class PlayerSeatComponent implements OnInit {
 
   ngOnInit() {
   }
-
-  onRoll() {
-    this.roll.emit();
-  }
 }
