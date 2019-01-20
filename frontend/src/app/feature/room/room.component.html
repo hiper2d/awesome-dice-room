@@ -1,5 +1,8 @@
 <div class="play-area top">
-  <span *ngIf="rollResult">{{ rollResult }}</span>
+    <textarea class="chatbox" matInput [value]="room.chatbox" readonly></textarea>
+    <mat-form-field class="message-input">
+        <input matInput autocomplete="off" [(ngModel)]="message" (keyup.enter)="onSendMessage()">
+    </mat-form-field>
 </div>
 
 <div class="play-area bottom">
@@ -9,7 +12,7 @@
             <span class="tab-header-text">{{ player.name }}</span>
         </ng-template>
         <div class="tab-body">
-            <app-player-seat [player]="player" (roll)="rollD6()"></app-player-seat>
+            <app-player-seat [player]="player"></app-player-seat>
         </div>
     </mat-tab>
   </mat-tab-group>

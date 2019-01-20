@@ -3,6 +3,7 @@ package com.hiper2d.handler
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.hiper2d.util.DiceRoller
 import com.hiper2d.util.WebSocketMessageType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.socket.WebSocketHandler
@@ -26,22 +27,18 @@ class EchoWebSocketHandler: WebSocketHandler {
     private val processor = EmitterProcessor.create<WsMessage>(false)
     private val outputEvents = Flux.from(processor)
     private val mapper = ObjectMapper().registerKotlinModule()
+    private val diceRoller = DiceRoller();
 
     override fun handle(session: WebSocketSession): Mono<Void> {
         val input = session.receive()
             .doOnNext {
-                val json = it.payloadAsText
-                val inMsg = mapper.readValue<WsMessage>(json)
+                val inMsg = mapper.readValue<WsMessage>(it.payloadAsText)
 
-                when (inMsg.type) {
-                    WebSocketMessageType.ROLL.toString() -> {
-                        val rollResult = processRollData(inMsg.data)
-                        val rollResponse = WsMessage(type = inMsg.type, data = rollResult)
-                        processor.onNext(rollResponse)
-                    }
-                    else -> {
-                        processor.onNext(inMsg)
-                    }
+                if (inMsg.type == WebSocketMessageType.MESSAGE.toString() && DiceRoller.isRoll(inMsg.data)) {
+                    processor.onNext(inMsg)
+                    processor.onNext(WsMessage(type = WebSocketMessageType.ROLL.toString(), data = diceRoller.roll(inMsg.data), senderId = inMsg.senderId))
+                } else {
+                    processor.onNext(inMsg)
                 }
             }
             .then()
@@ -51,14 +48,7 @@ class EchoWebSocketHandler: WebSocketHandler {
                 session.textMessage(mapper.writeValueAsString(it))
             }
         )
-        return Mono.zip(input, output).then()
-    }
 
-    private fun processRollData(data: String): String {
-        return data
-            .split(";")
-            .joinToString(";") {
-                Random.nextInt(1, 6).toString()
-            }
+        return Mono.zip(input, output).then()
     }
 }
