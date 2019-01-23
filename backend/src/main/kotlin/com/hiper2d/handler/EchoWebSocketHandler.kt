@@ -11,7 +11,6 @@ import org.springframework.web.reactive.socket.WebSocketSession
 import reactor.core.publisher.EmitterProcessor
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import kotlin.random.Random
 
 internal data class WsMessage(
     val type: String,
@@ -34,7 +33,7 @@ class EchoWebSocketHandler: WebSocketHandler {
             .doOnNext {
                 val inMsg = mapper.readValue<WsMessage>(it.payloadAsText)
 
-                if (inMsg.type == WebSocketMessageType.MESSAGE.toString() && DiceRoller.isRoll(inMsg.data)) {
+                if (inMsg.type == WebSocketMessageType.CHAT_MESSAGE.toString() && DiceRoller.isRoll(inMsg.data)) {
                     processor.onNext(inMsg)
                     processor.onNext(
                         WsMessage(

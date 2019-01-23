@@ -53,13 +53,13 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   onSendMessage() {
     if (this.message) {
-      this.sendMessage({type: WsMessageType.MESSAGE, data: this.message});
+      this.sendMessage({ type: WsMessageType.CHAT_MESSAGE, data: this.message });
       this.message = '';
     }
   }
 
   notifyOtherClientsThatYouJoined() {
-    this.sendMessage({type: WsMessageType.HI_I_AM_NEW_HERE, data: this.yourName});
+    this.sendMessage({ type: WsMessageType.HI_I_AM_NEW_HERE, data: this.yourName });
     this.room.pushMessage('Connected');
   }
 
@@ -92,7 +92,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           }
           break;
 
-        case WsMessageType.MESSAGE:
+        case WsMessageType.CHAT_MESSAGE:
           this.room.pushMessage(message.data, this.room.getPlayerNameById(message.senderId));
           break;
 

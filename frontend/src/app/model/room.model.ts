@@ -10,7 +10,7 @@ export class RoomModel {
 
   addPlayer(player: PlayerModel) {
     this.players.push(player);
-    this.namesCache.set(player.id, name);
+    this.namesCache.set(player.id, player.name);
   }
 
   removePlayer(id: string) {
