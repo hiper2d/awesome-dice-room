@@ -27,7 +27,7 @@ class EchoWebSocketHandler: WebSocketHandler {
     private val processor = EmitterProcessor.create<WsMessage>(false)
     private val outputEvents = Flux.from(processor)
     private val mapper = ObjectMapper().registerKotlinModule()
-    private val diceRoller = DiceRoller();
+    private val diceRoller = DiceRoller()
 
     override fun handle(session: WebSocketSession): Mono<Void> {
         val input = session.receive()
@@ -36,7 +36,13 @@ class EchoWebSocketHandler: WebSocketHandler {
 
                 if (inMsg.type == WebSocketMessageType.MESSAGE.toString() && DiceRoller.isRoll(inMsg.data)) {
                     processor.onNext(inMsg)
-                    processor.onNext(WsMessage(type = WebSocketMessageType.ROLL.toString(), data = diceRoller.roll(inMsg.data), senderId = inMsg.senderId))
+                    processor.onNext(
+                        WsMessage(
+                            type = WebSocketMessageType.ROLL.toString(),
+                            data = diceRoller.roll(inMsg.data),
+                            senderId = inMsg.senderId
+                        )
+                    )
                 } else {
                     processor.onNext(inMsg)
                 }

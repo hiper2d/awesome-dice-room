@@ -1,12 +1,13 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {WebSocketUtil} from '../../util/web-socket.util';
+import {WsUtil} from '../../util/ws.util';
 import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
 import {Router} from '@angular/router';
 import {RoomModel} from '../../model/room.model';
 import {UserService} from '../../core/service/user.service';
-import {WsMessageModel} from '../../model/ws-message.model';
+import {WsMessageModel, WsMessageModelParam} from '../../model/ws-message.model';
 import {WsMessageType} from '../../util/ws-message-type';
+import {PlayerModel} from '../../model/player.model';
 
 @Component({
   selector: 'app-room',
@@ -36,8 +37,8 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.router.navigate(['/']);
         } else {
           this.yourName = name;
-          this.room.addPlayer(this.userService.userId, name, true);
-          this.wsConnection = WebSocketUtil.connect(this.getWsMessageCallback());
+          this.room.addPlayer(new PlayerModel(this.userService.userId, name, true));
+          this.wsConnection = WsUtil.connect(this.getWsMessageCallback());
           this.wsConnection.onopen = () => this.notifyOtherClientsThatYouJoined();
         }
       });
@@ -45,6 +46,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // fixme: doesn't work
     this.sendMessage({ type: WsMessageType.DISCONNECT });
   }
 
@@ -67,12 +69,12 @@ export class RoomComponent implements OnInit, OnDestroy {
 
       switch (message.type) {
         case WsMessageType.ROLL:
-          this.room.pushMessage(`${this.room.getNameById(message.senderId)}'s Roll result is ${message.data}`);
+          this.room.pushMessage(`${this.room.getPlayerNameById(message.senderId)}'s Roll result is ${message.data}`);
           break;
 
         case WsMessageType.HI_I_AM_NEW_HERE:
           if (message.senderId !== this.userService.userId) {
-            this.room.addPlayer(message.senderId, message.data);
+            this.room.addPlayer(new PlayerModel(message.senderId, message.data));
             this.room.pushMessage(`${message.data} joined room`);
             this.sendMessage({
               type: WsMessageType.NICE_TO_MEET_YOU,
@@ -85,22 +87,24 @@ export class RoomComponent implements OnInit, OnDestroy {
 
         case WsMessageType.NICE_TO_MEET_YOU:
           if (message.direct && message.to === this.userService.userId) {
-            this.room.addPlayer(message.senderId, message.data);
-            this.room.pushMessage(`${message.data} already connected`);
+            this.room.addPlayer(new PlayerModel(message.senderId, message.data));
+            this.room.pushMessage(`${message.data} already connected`, this.yourName);
           }
           break;
 
         case WsMessageType.MESSAGE:
-          this.room.pushMessage(message.data, this.room.getNameById(message.senderId));
+          this.room.pushMessage(message.data, this.room.getPlayerNameById(message.senderId));
           break;
 
         case WsMessageType.DISCONNECT:
-          this.room.pushMessage(`${this.room.getNameById(message.senderId)} disconnected`);
+          this.room.pushMessage(`${this.room.getPlayerNameById(message.senderId)} disconnected`);
           this.room.removePlayer(message.senderId);
           break;
       }
     };
   }
 
-  private sendMessage = (params: any) => WebSocketUtil.send(this.wsConnection, this.userService.userId, params);
+  private sendMessage(params: WsMessageModelParam) {
+    WsUtil.send(this.wsConnection, { senderId: this.userService.userId, ...params });
+  }
 }

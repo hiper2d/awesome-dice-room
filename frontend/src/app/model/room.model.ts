@@ -1,24 +1,26 @@
 import {PlayerModel} from './player.model';
 
 export class RoomModel {
-  chatbox = '';
+  chatbox = ''; // todo: redesign this into queue of separate text messages
+  private namesCache = new Map<string, string>();
 
-  private names = {};
-
-  constructor(public players: PlayerModel[] = []) {
+  constructor(public players: Array<PlayerModel> = []) {
     this.players = players;
   }
 
-  addPlayer(id: string, name: string, isItYou: boolean = false) {
-    this.players.push(new PlayerModel(name, id, true));
-    this.names[id] = name;
+  addPlayer(player: PlayerModel) {
+    this.players.push(player);
+    this.namesCache.set(player.id, name);
   }
 
   removePlayer(id: string) {
     this.players.splice(this.players.findIndex(p => p.id === id), 1);
-    delete this.names[id];
+    this.namesCache.delete(id);
   }
 
-  pushMessage = (message: string, author: string = 'System') => this.chatbox = this.chatbox.concat(`\n ${new Date().toLocaleString()} ${author}:  ${message}`);
-  getNameById = (id: string): string => this.names[id];
+  pushMessage(message: string, author: string = 'System') {
+    this.chatbox = this.chatbox.concat(`\n ${new Date().toLocaleString()} ${author}:  ${message}`);
+  }
+
+  getPlayerNameById = (id: string): string => this.namesCache.get(id);
 }

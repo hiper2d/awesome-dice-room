@@ -1,7 +1,4 @@
 export class PlayerModel {
-  joined: boolean;
-  id: string;
-
-  constructor(public name: string, public userId: string, public isItYou: boolean = false) {
+  constructor(public id: string, public name: string, public isItYou: boolean = false) {
   }
 }
