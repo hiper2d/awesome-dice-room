@@ -18,7 +18,7 @@
   <mat-tab-group dynamicHeight color="accent">
     <mat-tab *ngFor="let player of room.players | keyvalue" [label]="player.value.name">
         <ng-template mat-tab-label>
-            <mat-icon *ngIf="player.value.connected" class="connected mat-accent">done</mat-icon>
+            <mat-icon *ngIf="player.value.connected" class="mat-accent">done</mat-icon>
             <span class="tab-header-text">{{ player.value.name }}</span>
         </ng-template>
         <div class="tab-body">

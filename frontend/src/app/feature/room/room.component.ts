@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {WsUtil} from '../../util/ws.util';
 import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
@@ -28,6 +28,11 @@ export class RoomComponent implements OnInit, OnDestroy {
     private dialog: MatDialog
   ) {}
 
+  @HostListener('window:beforeunload')
+  onGlobalExit() {
+    this.ngOnDestroy();
+  }
+
   ngOnInit() {
     setTimeout(() => { // hack to avoid 'value has been changed before check'
       const dialogRef = this.dialog.open(RoomDialogComponent);
@@ -52,7 +57,6 @@ export class RoomComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.sendMessage({ type: WsMessageType.DISCONNECT });
   }
-
 
   onSendMessage() {
     if (this.message) {
