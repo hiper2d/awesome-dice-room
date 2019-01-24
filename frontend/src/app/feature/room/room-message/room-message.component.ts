@@ -11,15 +11,13 @@ export class RoomMessageComponent {
 
     getAuthorStyle() {
         return {
-            color: this.message.author.isSystem() && 'red' || `#${this.message.author.color}`,
-            'font-weight': this.message.author.isSystem() && 'bold'
+            color: this.message.author.isSystem() && 'red' || `#${this.message.author.color}`
         };
     }
 
     getMessageStyle() {
         return {
-            color: this.message.author.isSystem() && 'red',
-            'font-weight': this.message.author.isSystem() && 'bold'
+            color: this.message.author.isSystem() && 'red'
         };
     }
 }

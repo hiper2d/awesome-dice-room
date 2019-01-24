@@ -15,11 +15,11 @@
 </div>
 
 <div class="play-area bottom">
-  <mat-tab-group dynamicHeight [color]="'accent'">
+  <mat-tab-group dynamicHeight color="accent">
     <mat-tab *ngFor="let player of room.players | keyvalue" [label]="player.value.name">
         <ng-template mat-tab-label>
+            <mat-icon *ngIf="player.value.connected" class="connected mat-accent">done</mat-icon>
             <span class="tab-header-text">{{ player.value.name }}</span>
-            <i class="material-icons connected" [ngStyle]="{ color: player.value.connected && 'green' }">done_outline</i>
         </ng-template>
         <div class="tab-body">
             <player-seat [player]="player.value"></player-seat>
