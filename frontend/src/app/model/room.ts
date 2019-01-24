@@ -4,6 +4,7 @@ import {Queue} from '../util/queue';
 
 export class Room {
   constructor(
+      public id: string,
       public players = new Map<string, Player>(),
       public messages: Queue<RoomMessage> = new Queue(10)
   ) {}
