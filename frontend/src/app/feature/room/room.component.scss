@@ -19,8 +19,22 @@
     color: #fff;
   }
 
+  .chatbox {
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+  }
+
+  .message-input {
+    width: 100%;
+  }
+
   .tab-header-text {
     color: #fff
+  }
+
+  mat-icon {
+    margin-right: 10px;
   }
 
   .tab-body {
@@ -28,18 +42,4 @@
       margin: 5px;
     }
   }
-}
-
-.chatbox {
-  height: 100%;
-  width: 100%;
-  overflow-y: auto;
-}
-
-.message-input {
-  width: 100%;
-}
-
-.connected {
-  margin-left: 10px;
 }
