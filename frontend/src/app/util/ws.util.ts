@@ -2,8 +2,8 @@ import {WsMessage, WsMessageParam} from '../model/ws-message';
 
 
 export class WsUtil {
-  static connect(onMessageCallback: (string) => void): WebSocket {
-    const connection = new WebSocket(`ws://${window.location.hostname}:8080/ws/echo`);
+  static connect(roomId: string, onMessageCallback: (string) => void): WebSocket {
+    const connection = new WebSocket(`ws://${window.location.hostname}:8080/ws/room/${roomId}`);
     connection.onmessage = onMessageCallback;
     return connection;
   }

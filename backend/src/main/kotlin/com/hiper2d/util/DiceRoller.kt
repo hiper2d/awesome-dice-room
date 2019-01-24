@@ -32,7 +32,7 @@ class DiceRoller {
 }
 
 internal fun roll(sides: Int): Int = sides.takeIf { it > 1 }?.let { Random.nextInt(1, it) } ?: 1
-internal fun intMatchOrElse(match: String, default: Int): Int = match.takeIf{ !it.isEmpty() }?.toInt() ?: default
+internal fun intMatchOrElse(match: String, default: Int): Int = match.takeUnless { it.isEmpty() }?.toInt() ?: default
 
 internal fun getDieProp(match: MatchResult): DieProp {
     val times: Int = intMatchOrElse(match.groupValues[1], 1)

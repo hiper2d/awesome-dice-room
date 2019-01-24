@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono
 
 internal data class WsMessage(
     val type: String,
+    val roomId: String,
     val data: String = "",
     val senderId: String = "",
     val direct: Boolean = false,
@@ -21,7 +22,7 @@ internal data class WsMessage(
 )
 
 @Component
-class EchoWebSocketHandler: WebSocketHandler {
+class RoomWebSocketHandler: WebSocketHandler {
 
     private val processor = EmitterProcessor.create<WsMessage>(false)
     private val outputEvents = Flux.from(processor)
@@ -32,28 +33,41 @@ class EchoWebSocketHandler: WebSocketHandler {
         val input = session.receive()
             .doOnNext {
                 val inMsg = mapper.readValue<WsMessage>(it.payloadAsText)
-
-                if (inMsg.type == WebSocketMessageType.CHAT_MESSAGE.toString() && DiceRoller.isRoll(inMsg.data)) {
-                    processor.onNext(inMsg)
-                    processor.onNext(
-                        WsMessage(
-                            type = WebSocketMessageType.ROLL.toString(),
-                            data = diceRoller.roll(inMsg.data),
-                            senderId = inMsg.senderId
-                        )
-                    )
-                } else {
-                    processor.onNext(inMsg)
+                when {
+                    isRollMessage(inMsg) -> processRollMessage(inMsg)
+                    else -> echoMessage(inMsg)
                 }
             }
             .then()
 
         val output = session.send(
-            outputEvents.map {
-                session.textMessage(mapper.writeValueAsString(it))
-            }
+            outputEvents
+                .filter { isSameRoom(it, session) }
+                .map { session.textMessage(mapper.writeValueAsString(it)) }
         )
 
         return Mono.zip(input, output).then()
     }
+
+    private fun isSameRoom(iMsg: WsMessage, session: WebSocketSession) =
+        iMsg.roomId == session.handshakeInfo.uri.path.substringAfterLast("/")
+
+    private fun processRollMessage(inMsg: WsMessage) {
+        echoMessage(inMsg)
+        processor.onNext(
+            WsMessage(
+                type = WebSocketMessageType.ROLL.toString(),
+                roomId = inMsg.roomId,
+                data = diceRoller.roll(inMsg.data),
+                senderId = inMsg.senderId
+            )
+        )
+    }
+
+    private fun echoMessage(inMsg: WsMessage) {
+        processor.onNext(inMsg)
+    }
+
+    private fun isRollMessage(inMsg: WsMessage) =
+        inMsg.type == WebSocketMessageType.CHAT_MESSAGE.toString() && DiceRoller.isRoll(inMsg.data)
 }

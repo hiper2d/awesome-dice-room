@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
+import {UuidUtil} from '../../util/uuid.util';
 
 @Component({
   selector: 'dashboard',
@@ -14,6 +15,7 @@ export class DashboardComponent implements OnInit {
   }
 
   openRoom() {
-    this.router.navigate(['/room']);
+    const roomId = UuidUtil.generateUuid();
+    this.router.navigate(['/room', roomId]);
   }
 }
