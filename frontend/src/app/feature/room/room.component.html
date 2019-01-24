@@ -1,18 +1,28 @@
 <div class="play-area top">
-    <textarea class="chatbox" matInput [value]="room.chatbox" readonly></textarea>
+    <div class="chatbox" #chatbox [scrollTop]="chatbox.scrollHeight">
+        <mat-list>
+            <mat-list-item *ngFor="let msg of room.messages.asArray()">
+                <room-message [message]="msg"></room-message>
+            </mat-list-item>
+        </mat-list>
+    </div>
+
     <mat-form-field class="message-input">
-        <input matInput autocomplete="off" [(ngModel)]="message" (keyup.enter)="onSendMessage()">
+        <label>
+            <input matInput autocomplete="off" [(ngModel)]="message" (keyup.enter)="onSendMessage()" autofocus>
+        </label>
     </mat-form-field>
 </div>
 
 <div class="play-area bottom">
   <mat-tab-group dynamicHeight [color]="'accent'">
-    <mat-tab *ngFor="let player of this.room.players" [label]="player.name">
+    <mat-tab *ngFor="let player of room.players | keyvalue" [label]="player.value.name">
         <ng-template mat-tab-label>
-            <span class="tab-header-text">{{ player.name }}</span>
+            <span class="tab-header-text">{{ player.value.name }}</span>
+            <i class="material-icons connected" [ngStyle]="{ color: player.value.connected && 'green' }">done_outline</i>
         </ng-template>
         <div class="tab-body">
-            <app-player-seat [player]="player"></app-player-seat>
+            <player-seat [player]="player.value"></player-seat>
         </div>
     </mat-tab>
   </mat-tab-group>

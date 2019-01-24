@@ -1,8 +1,8 @@
 <mat-form-field class="full-width">
-  <input matInput placeholder="Your name" autocomplete="off" [(ngModel)]="name">
+  <input matInput placeholder="Your name" autocomplete="off" [(ngModel)]="name" (keyup.enter)="onAccept()" autofocus>
 </mat-form-field>
 
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Cancel</button>
-  <button mat-button [mat-dialog-close]="name" cdkFocusInitial>Let's go!</button>
+  <button mat-button (click)="onAccept()">Let's go!</button>
 </div>

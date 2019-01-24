@@ -1,21 +1,16 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {MatDialogRef} from '@angular/material';
 
 @Component({
-  selector: 'app-room-dialog',
+  selector: 'room-dialog',
   templateUrl: './room-dialog.component.html',
   styleUrls: ['./room-dialog.component.scss']
 })
-export class RoomDialogComponent implements OnInit {
-
+export class RoomDialogComponent {
   name: string;
 
   constructor(public dialogRef: MatDialogRef<RoomDialogComponent>) {}
 
-  ngOnInit() {
-  }
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
+  onAccept = () => this.dialogRef.close(this.name);
+  onNoClick = () => this.dialogRef.close();
 }

@@ -1,0 +1,12 @@
+.room-message {
+  display: flex;
+
+  > div {
+    color: black;
+    margin-right: 10px;
+  }
+
+  .rm-author::after {
+    content: ':';
+  }
+}

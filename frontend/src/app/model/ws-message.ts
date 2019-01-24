@@ -1,4 +1,4 @@
-export interface WsMessageModelParam {
+export interface WsMessageParam {
   type: string;
   data?: string;
   senderId?: string;
@@ -6,14 +6,14 @@ export interface WsMessageModelParam {
   to?: string;
 }
 
-export class WsMessageModel {
+export class WsMessage {
   type: string;
   data: string;
   senderId: string;
   direct: boolean;
   to: string;
 
-  constructor(param: WsMessageModelParam) {
+  constructor(param: WsMessageParam) {
     if (param) {
       this.type = param.type;
       this.data = param.data;
