@@ -3,24 +3,24 @@ import {WsUtil} from '../../util/ws.util';
 import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
 import {Router} from '@angular/router';
-import {RoomModel} from '../../model/room.model';
+import {Room} from '../../model/room';
 import {UserService} from '../../core/service/user.service';
-import {WsMessageModel, WsMessageModelParam} from '../../model/ws-message.model';
+import {WsMessage, WsMessageParam} from '../../model/ws-message';
 import {WsMessageType} from '../../util/ws-message-type';
-import {PlayerModel} from '../../model/player.model';
+import {Player} from '../../model/player';
 
 @Component({
-  selector: 'app-room',
+  selector: 'room',
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss']
 })
 export class RoomComponent implements OnInit, OnDestroy {
 
-  yourName: string;
   message = '';
-  room = new RoomModel();
+  room = new Room();
 
   private wsConnection: WebSocket;
+  private you: Player;
 
   constructor(
     private userService: UserService,
@@ -36,17 +36,20 @@ export class RoomComponent implements OnInit, OnDestroy {
         if (!name) {
           this.router.navigate(['/']);
         } else {
-          this.yourName = name;
-          this.room.addPlayer(new PlayerModel(this.userService.userId, name, true));
+          this.you = new Player(this.userService.userId, name);
+          this.room.addPlayer(this.you);
           this.wsConnection = WsUtil.connect(this.getWsMessageCallback());
           this.wsConnection.onopen = () => this.notifyOtherClientsThatYouJoined();
         }
       });
     });
+
+    window.onbeforeunload = () => {
+      this.ngOnDestroy();
+    };
   }
 
   ngOnDestroy() {
-    // fixme: doesn't work
     this.sendMessage({ type: WsMessageType.DISCONNECT });
   }
 
@@ -59,26 +62,26 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   notifyOtherClientsThatYouJoined() {
-    this.sendMessage({ type: WsMessageType.HI_I_AM_NEW_HERE, data: this.yourName });
+    this.sendMessage({ type: WsMessageType.HI_I_AM_NEW_HERE, data: this.you.name });
     this.room.pushMessage('Connected');
   }
 
   private getWsMessageCallback(): (any) => void {
     return (result) => {
-      const message = JSON.parse(result.data) as WsMessageModel;
+      const message = JSON.parse(result.data) as WsMessage;
 
       switch (message.type) {
         case WsMessageType.ROLL:
-          this.room.pushMessage(`${this.room.getPlayerNameById(message.senderId)}'s Roll result is ${message.data}`);
+          this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name}'s Roll result is ${message.data}`);
           break;
 
         case WsMessageType.HI_I_AM_NEW_HERE:
           if (message.senderId !== this.userService.userId) {
-            this.room.addPlayer(new PlayerModel(message.senderId, message.data));
+            this.room.addPlayer(new Player(message.senderId, message.data));
             this.room.pushMessage(`${message.data} joined room`);
             this.sendMessage({
               type: WsMessageType.NICE_TO_MEET_YOU,
-              data: this.yourName,
+              data: this.you.name,
               direct: true,
               to: message.senderId
             });
@@ -87,24 +90,24 @@ export class RoomComponent implements OnInit, OnDestroy {
 
         case WsMessageType.NICE_TO_MEET_YOU:
           if (message.direct && message.to === this.userService.userId) {
-            this.room.addPlayer(new PlayerModel(message.senderId, message.data));
-            this.room.pushMessage(`${message.data} already connected`, this.yourName);
+            this.room.addPlayer(new Player(message.senderId, message.data));
+            this.room.pushMessage(`${message.data} already connected`);
           }
           break;
 
         case WsMessageType.CHAT_MESSAGE:
-          this.room.pushMessage(message.data, this.room.getPlayerNameById(message.senderId));
+          this.room.pushMessage(message.data, this.room.getPlayerById(message.senderId));
           break;
 
         case WsMessageType.DISCONNECT:
-          this.room.pushMessage(`${this.room.getPlayerNameById(message.senderId)} disconnected`);
-          this.room.removePlayer(message.senderId);
+          this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name} disconnected`);
+          this.room.getPlayerById(message.senderId).connected = false;
           break;
       }
     };
   }
 
-  private sendMessage(params: WsMessageModelParam) {
+  private sendMessage(params: WsMessageParam) {
     WsUtil.send(this.wsConnection, { senderId: this.userService.userId, ...params });
   }
 }

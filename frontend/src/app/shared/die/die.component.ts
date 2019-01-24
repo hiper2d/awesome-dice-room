@@ -1,10 +1,10 @@
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {DieModel} from '../../model/die.model';
+import {Die} from '../../model/die';
 import {Subscription} from 'rxjs';
 
 @Component({
-  selector: 'app-die',
+  selector: 'die',
   templateUrl: './die.component.html',
   styleUrls: ['./die.component.scss'],
   providers: [{
@@ -15,7 +15,7 @@ import {Subscription} from 'rxjs';
 })
 export class DieComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
-  die: DieModel;
+  die: Die;
   checkboxControl = new FormControl(false);
 
   private sbscr: Subscription;
@@ -44,7 +44,7 @@ export class DieComponent implements OnInit, OnDestroy, ControlValueAccessor {
   setDisabledState(isDisabled: boolean): void {
   }
 
-  writeValue(obj: DieModel): void {
+  writeValue(obj: Die): void {
     if (obj) {
       this.die = obj;
       this.checkboxControl.setValue(obj.selected, {emitEvent: false});

@@ -1,0 +1,5 @@
+<div class="room-message">
+   <div>{{message.timestamp}}</div>
+   <div class="rm-author" [ngStyle]="getAuthorStyle()">{{message.author.name}}</div>
+   <div [ngStyle]="getMessageStyle()">{{message.body}}</div>
+</div>
