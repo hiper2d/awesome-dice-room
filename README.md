@@ -8,7 +8,8 @@ The project consists of two applications (for now at least): the Angular fronten
 I've just started so not much things has been done yet. The design is raw and ugly, I hope to come up with something better in future.
 
 ![dashboard](https://raw.githubusercontent.com/hiper2d/awesome-dice-room/master/doc/dashboard.png)
-![room](https://raw.githubusercontent.com/hiper2d/awesome-dice-room/master/doc/room.png)
+
+![room](https://raw.githubusercontent.com/hiper2d/awesome-dice-room/master/doc/room2.png)
 
 ##### Technology stack
 * Spring Framework 5 with Webflux/Reactor and Netty server
