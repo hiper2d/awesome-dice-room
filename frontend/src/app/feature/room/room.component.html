@@ -1,7 +1,7 @@
 <div class="play-area top">
-    <div *ngIf="room != null" class="chatbox" #chatbox [scrollTop]="chatbox.scrollHeight">
+    <div class="chatbox" #chatbox [scrollTop]="chatbox.scrollHeight">
         <mat-list>
-            <mat-list-item *ngFor="let msg of room.messages.asArray()">
+            <mat-list-item *ngFor="let msg of room?.messages.asArray()">
                 <room-message [message]="msg"></room-message>
             </mat-list-item>
         </mat-list>
@@ -15,8 +15,8 @@
 </div>
 
 <div class="play-area bottom">
-  <mat-tab-group *ngIf="room != null" dynamicHeight color="accent">
-    <mat-tab *ngFor="let player of room.players | keyvalue" [label]="player.value.name">
+  <mat-tab-group dynamicHeight color="accent">
+    <mat-tab *ngFor="let player of room?.players | keyvalue" [label]="player.value.name">
         <ng-template mat-tab-label>
             <mat-icon *ngIf="player.value.connected" class="mat-accent">done</mat-icon>
             <span class="tab-header-text">{{ player.value.name }}</span>

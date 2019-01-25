@@ -1,4 +1,4 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {Component, HostListener, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {WsUtil} from '../../util/ws.util';
 import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
@@ -29,7 +29,8 @@ export class RoomComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private router: Router,
     private dialog: MatDialog,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private zone: NgZone
   ) {}
 
   @HostListener('window:beforeunload')
@@ -38,19 +39,21 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.route.paramMap.pipe(
-      map((params: ParamMap) => params.get('roomId')),
-      flatMap(roomId => this.dialog.open(RoomDialogComponent, new RoomDialogInput(roomId)).afterClosed()),
-    ).subscribe( (dialogData: RoomDialogOutput) => {
-      if (!dialogData) {
-        this.router.navigate(['/']);
-      } else {
-        this.room = new Room(dialogData.roomId);
-        this.you = new Player(this.userService.userId, dialogData.name);
-        this.room.addPlayer(this.you);
-        this.wsConnection = WsUtil.connect(this.room.id, this.getWsMessageCallback());
-        this.wsConnection.onopen = () => this.notifyOtherClientsThatYouJoined();
-      }
+    this.zone.run(() => { // hack to avoid 'value has been changed before check'
+      this.route.paramMap.pipe(
+        map((params: ParamMap) => params.get('roomId')),
+        flatMap(roomId => this.dialog.open(RoomDialogComponent, new RoomDialogInput(roomId)).afterClosed()),
+      ).subscribe( (dialogData: RoomDialogOutput) => {
+        if (!dialogData) {
+          this.router.navigate(['/']);
+        } else {
+          this.room = new Room(dialogData.roomId);
+          this.you = new Player(this.userService.userId, dialogData.name);
+          this.room.addPlayer(this.you);
+          this.wsConnection = WsUtil.connect(this.room.id, this.getWsMessageCallback());
+          this.wsConnection.onopen = () => this.notifyOtherClientsThatYouJoined();
+        }
+      });
     });
   }
 
