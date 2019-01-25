@@ -1,5 +1,5 @@
 <div class="play-area top">
-    <div class="chatbox" #chatbox [scrollTop]="chatbox.scrollHeight">
+    <div class="chatbox" #chatbox>
         <mat-list>
             <mat-list-item *ngFor="let msg of room?.messages.asArray()">
                 <room-message [message]="msg"></room-message>

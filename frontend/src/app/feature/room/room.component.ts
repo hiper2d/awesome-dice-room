@@ -1,4 +1,4 @@
-import {Component, HostListener, NgZone, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {WsUtil} from '../../util/ws.util';
 import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
@@ -18,7 +18,7 @@ import {RoomDialogInput} from '../../model/room-dialog-input';
   styleUrls: ['./room.component.scss']
 })
 export class RoomComponent implements OnInit, OnDestroy {
-
+  @ViewChild('chatbox') chatbox: ElementRef;
   message = '';
   room: Room;
 
@@ -29,8 +29,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private router: Router,
     private dialog: MatDialog,
-    private route: ActivatedRoute,
-    private zone: NgZone
+    private route: ActivatedRoute
   ) {}
 
   @HostListener('window:beforeunload')
@@ -39,7 +38,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.zone.run(() => { // hack to avoid 'value has been changed before check'
+    setTimeout(() => { // hack to avoid 'value has been changed before check'
       this.route.paramMap.pipe(
         map((params: ParamMap) => params.get('roomId')),
         flatMap(roomId => this.dialog.open(RoomDialogComponent, new RoomDialogInput(roomId)).afterClosed()),
@@ -111,6 +110,8 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.room.getPlayerById(message.senderId).connected = false;
           break;
       }
+
+      setTimeout(() => this.chatbox.nativeElement.scrollTop = this.chatbox.nativeElement.scrollHeight);
     };
   }
 
