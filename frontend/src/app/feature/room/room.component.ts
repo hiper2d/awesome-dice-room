@@ -2,13 +2,15 @@ import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {WsUtil} from '../../util/ws.util';
 import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, ParamMap, Router} from '@angular/router';
 import {Room} from '../../model/room';
 import {UserService} from '../../core/service/user.service';
 import {WsMessage, WsMessageParam} from '../../model/ws-message';
 import {WsMessageType} from '../../util/ws-message-type';
 import {Player} from '../../model/player';
-import {UuidUtil} from '../../util/uuid.util';
+import {flatMap, map} from 'rxjs/operators';
+import {RoomDialogOutput} from '../../model/room-dialog-output';
+import {RoomDialogInput} from '../../model/room-dialog-input';
 
 @Component({
   selector: 'room',
@@ -18,7 +20,7 @@ import {UuidUtil} from '../../util/uuid.util';
 export class RoomComponent implements OnInit, OnDestroy {
 
   message = '';
-  room = new Room('1'); // todo: there will be uuid for every room stored in database
+  room: Room;
 
   private wsConnection: WebSocket;
   private you: Player;
@@ -36,24 +38,20 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    setTimeout(() => { // hack to avoid 'value has been changed before check'
-      const dialogRef = this.dialog.open(RoomDialogComponent);
-
-      dialogRef.afterClosed().subscribe(name => {
-        if (!name) {
-          this.router.navigate(['/']);
-        } else {
-          this.you = new Player(this.userService.userId, name);
-          this.room.addPlayer(this.you);
-          this.wsConnection = WsUtil.connect(this.room.id, this.getWsMessageCallback());
-          this.wsConnection.onopen = () => this.notifyOtherClientsThatYouJoined();
-        }
-      });
+    this.route.paramMap.pipe(
+      map((params: ParamMap) => params.get('roomId')),
+      flatMap(roomId => this.dialog.open(RoomDialogComponent, new RoomDialogInput(roomId)).afterClosed()),
+    ).subscribe( (dialogData: RoomDialogOutput) => {
+      if (!dialogData) {
+        this.router.navigate(['/']);
+      } else {
+        this.room = new Room(dialogData.roomId);
+        this.you = new Player(this.userService.userId, dialogData.name);
+        this.room.addPlayer(this.you);
+        this.wsConnection = WsUtil.connect(this.room.id, this.getWsMessageCallback());
+        this.wsConnection.onopen = () => this.notifyOtherClientsThatYouJoined();
+      }
     });
-
-    window.onbeforeunload = () => {
-      this.ngOnDestroy();
-    };
   }
 
   ngOnDestroy() {
@@ -114,6 +112,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   private sendMessage(params: WsMessageParam) {
-    WsUtil.send(this.wsConnection, { roomId: this.room.id, senderId: this.userService.userId, ...params });
+    if (this.room) {
+      WsUtil.send(this.wsConnection, { roomId: this.room.id, senderId: this.userService.userId, ...params });
+    }
   }
 }
