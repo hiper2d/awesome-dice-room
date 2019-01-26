@@ -1,8 +1,8 @@
 package com.hiper2d.repository
 
-import com.hiper2d.model.TestDto
+import com.hiper2d.model.Echo
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface TestRepository: ReactiveMongoRepository<TestDto, String>
+interface EchoRepository: ReactiveMongoRepository<Echo, String>
