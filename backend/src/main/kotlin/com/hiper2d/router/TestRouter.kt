@@ -1,6 +1,6 @@
 package com.hiper2d.router
 
-import com.hiper2d.handler.TestHandler
+import com.hiper2d.handler.EchoHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
@@ -10,12 +10,12 @@ import org.springframework.web.reactive.function.server.router
 class TestRouter {
 
     @Bean
-    fun router(testHandler: TestHandler) = router {
+    fun router(EchoHandler: EchoHandler) = router {
         GET("/api/tests").nest {
-            accept(MediaType.TEXT_HTML, testHandler::readAll)
+            accept(MediaType.TEXT_HTML, EchoHandler::readAll)
         }
         POST("/api/test").nest {
-            accept(MediaType.APPLICATION_JSON_UTF8, testHandler::saveX)
+            accept(MediaType.APPLICATION_JSON_UTF8, EchoHandler::saveX)
         }
     }
 }
