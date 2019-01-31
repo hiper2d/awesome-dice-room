@@ -11,6 +11,7 @@ import {Player} from '../../model/player';
 import {flatMap, map} from 'rxjs/operators';
 import {RoomDialogOutput} from '../../model/room-dialog-output';
 import {RoomDialogInput} from '../../model/room-dialog-input';
+import {Inventory} from '../../model/inventory';
 
 @Component({
   selector: 'room',
@@ -21,9 +22,9 @@ export class RoomComponent implements OnInit, OnDestroy {
   @ViewChild('chatbox') chatbox: ElementRef;
   message = '';
   room: Room;
+  you: Player;
 
   private wsConnection: WebSocket;
-  private you: Player;
 
   constructor(
     private userService: UserService,
@@ -72,6 +73,13 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.room.pushMessage('Connected');
   }
 
+  getPlayers(): Array<Player> {
+    return this.room && Array.from<Player>(this.room.players.values())
+      .sort((a, b) => a.id === this.you.id ? -1 : 0);
+  }
+
+  onInventorySave = (inventory: Inventory) => this.sendMessage({ type: WsMessageType.INVENTORY, data: inventory });
+
   private getWsMessageCallback(): (any) => void {
     return (result) => {
       const message = JSON.parse(result.data) as WsMessage;
@@ -108,6 +116,16 @@ export class RoomComponent implements OnInit, OnDestroy {
         case WsMessageType.DISCONNECT:
           this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name} disconnected`);
           this.room.getPlayerById(message.senderId).connected = false;
+          break;
+
+        case WsMessageType.INVENTORY:
+          const inventory: Inventory = message.data;
+          const items = inventory.items.reduce((acc, i) => `${acc}<br/> name: ${i.name} description: ${i.description}`, '');
+          this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name}'s items :<br/>${items}`);
+
+          if (this.you.id !== message.senderId) {
+            this.room.players.get(message.senderId).inventory = message.data;
+          }
           break;
       }
 

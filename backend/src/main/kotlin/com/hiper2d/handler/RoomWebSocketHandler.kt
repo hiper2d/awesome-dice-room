@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono
 internal data class WsMessage(
     val type: String,
     val roomId: String,
-    val data: String = "",
+    val data: Any,
     val senderId: String = "",
     val direct: Boolean = false,
     val to: String = ""
@@ -58,7 +58,7 @@ class RoomWebSocketHandler: WebSocketHandler {
             WsMessage(
                 type = WebSocketMessageType.ROLL.toString(),
                 roomId = inMsg.roomId,
-                data = diceRoller.roll(inMsg.data),
+                data = diceRoller.roll(inMsg.data as String),
                 senderId = inMsg.senderId
             )
         )
@@ -69,5 +69,5 @@ class RoomWebSocketHandler: WebSocketHandler {
     }
 
     private fun isRollMessage(inMsg: WsMessage) =
-        inMsg.type == WebSocketMessageType.CHAT_MESSAGE.toString() && DiceRoller.isRoll(inMsg.data)
+        inMsg.type == WebSocketMessageType.CHAT_MESSAGE.toString() && DiceRoller.isRoll(inMsg.data as String)
 }
