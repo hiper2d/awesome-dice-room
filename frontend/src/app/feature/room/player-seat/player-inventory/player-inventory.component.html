@@ -9,28 +9,30 @@
   </mat-list>
 </ng-container>
 
-<form *ngIf="!readonly" #inventoryForm="ngForm">
-  <mat-list>
-    <mat-list-item *ngFor="let item of inventory.items; let idx = index">
-      <div class="inventory-item">
-        <mat-form-field>
-          <input matInput autocomplete="off" [(ngModel)]="item.name" name="name{{idx}}" required>
-        </mat-form-field>
-        <mat-form-field>
-          <input matInput autocomplete="off" [(ngModel)]="item.description" name="desc{{idx}}" required>
-        </mat-form-field>
-        <button mat-icon-button (click)="removeItem(idx)" color="warn">
-          <mat-icon>remove_circle</mat-icon>
+<form *ngIf="!readonly" class="player-inventory" #inventoryForm="ngForm">
+    <div class="inventory-buttons">
+        <button mat-icon-button (click)="addItem()" color="accent">
+            <mat-icon>add_circle</mat-icon>
         </button>
-      </div>
-    </mat-list-item>
-  </mat-list>
-  <button mat-icon-button (click)="addItem(); inventoryForm.form.markAsDirty()" color="accent">
-    <mat-icon>add_circle</mat-icon>
-  </button>
-  <button mat-button *ngIf="inventoryForm.dirty"
-          [disabled]="!inventoryForm.valid"
-          (click)="onSave(); inventoryForm.form.markAsPristine()">
-      Save Changes
-  </button>
+        <button mat-icon-button [disabled]="!inventoryForm.valid || inventoryForm.pristine" (click)="onSave()" color="accent">
+            <mat-icon>save</mat-icon>
+        </button>
+    </div>
+    <div class="inventory-items full-size">
+        <mat-list class="full-size">
+            <mat-list-item *ngFor="let item of inventory.items">
+                <div class="inventory-item">
+                    <mat-form-field>
+                        <input matInput autocomplete="off" [(ngModel)]="item.name" name="name{{item.id}}" required>
+                    </mat-form-field>
+                    <mat-form-field>
+                        <input matInput autocomplete="off" [(ngModel)]="item.description" name="desc{{item.id}}" required>
+                    </mat-form-field>
+                    <button mat-icon-button (click)="removeItem(item.id)" color="warn">
+                        <mat-icon>remove_circle</mat-icon>
+                    </button>
+                </div>
+            </mat-list-item>
+        </mat-list>
+    </div>
 </form>
