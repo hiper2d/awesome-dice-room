@@ -1,5 +1,6 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Player} from '../../../model/player';
+import {Inventory} from '../../../model/inventory';
 
 @Component({
   selector: 'player-seat',
@@ -8,4 +9,8 @@ import {Player} from '../../../model/player';
 })
 export class PlayerSeatComponent {
   @Input() player: Player;
+  @Input() readonly = true;
+  @Output() inventorySave = new EventEmitter();
+
+  onInventorySave = (inventory: Inventory) => this.inventorySave.emit(inventory);
 }

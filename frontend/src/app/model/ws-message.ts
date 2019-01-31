@@ -1,7 +1,7 @@
 export interface WsMessageParam {
   type: string;
   roomId?: string;
-  data?: string;
+  data?: any;
   senderId?: string;
   direct?: boolean;
   to?: string;
@@ -10,7 +10,7 @@ export interface WsMessageParam {
 export class WsMessage {
   type: string;
   roomId: string;
-  data: string;
+  data: any;
   senderId: string;
   direct: boolean;
   to: string;

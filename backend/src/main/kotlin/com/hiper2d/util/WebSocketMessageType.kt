@@ -6,5 +6,6 @@ enum class WebSocketMessageType {
     NICE_TO_MEET_YOU,
     CHAT_MESSAGE,
     CONNECT,
-    DISCONNECT
+    DISCONNECT,
+    INVENTORY
 }

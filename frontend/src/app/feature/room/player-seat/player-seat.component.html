@@ -1,0 +1,8 @@
+<div class="player-seat">
+    <div class="avatar" style="background-image: url('https://scontent-frx5-1.xx.fbcdn.net/v/t1.0-9/36175900_2084401278496224_2688970447252357120_n.jpg?_nc_cat=105&_nc_ht=scontent-frx5-1.xx&oh=1669f8f4c17ab4a33b5d448556f7432c&oe=5CFA3F47')">
+    </div>
+
+    <div class="inventory">
+        <player-inventory [readonly]="readonly" [inventory]="player.inventory" (save)="onInventorySave($event)"></player-inventory>
+    </div>
+</div>

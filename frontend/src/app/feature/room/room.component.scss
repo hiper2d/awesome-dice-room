@@ -23,6 +23,11 @@
     height: 100%;
     width: 100%;
     overflow-y: auto;
+
+    .mat-list-item {
+      height: auto;
+      margin-bottom: 5px;
+    }
   }
 
   .message-input {

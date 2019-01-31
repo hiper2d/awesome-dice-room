@@ -1,0 +1,22 @@
+.inventory-item {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+
+  > span {
+    width: 50%;
+    word-break: break-all;
+  }
+
+  > mat-form-field {
+    width: 45%;
+  }
+
+  > * {
+    margin-left: 10px;
+
+    .mat-icon {
+      vertical-align: bottom;
+    }
+  }
+}

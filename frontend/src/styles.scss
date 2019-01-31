@@ -14,4 +14,10 @@ body {
 
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACZJREFUeNpi/PTpEwMY8PLyMsFZnz9/ZoKzgAzG////Q1hAABBgAFeiDto+NxIZAAAAAElFTkSuQmCC");
   background-repeat: repeat;
+
+  .tab-body,
+  .mat-tab-group,
+  .mat-tab-body-wrapper {
+    height: 100%;
+  }
 }

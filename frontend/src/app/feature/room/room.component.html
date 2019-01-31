@@ -8,21 +8,19 @@
     </div>
 
     <mat-form-field class="message-input">
-        <label>
-            <input matInput autocomplete="off" [(ngModel)]="message" (keyup.enter)="onSendMessage()" autofocus>
-        </label>
+        <input matInput autocomplete="off" [(ngModel)]="message" (keyup.enter)="onSendMessage()" autofocus>
     </mat-form-field>
 </div>
 
 <div class="play-area bottom">
-  <mat-tab-group dynamicHeight color="accent">
-    <mat-tab *ngFor="let player of room?.players | keyvalue" [label]="player.value.name">
+  <mat-tab-group color="accent">
+    <mat-tab *ngFor="let player of getPlayers()" [label]="player.name">
         <ng-template mat-tab-label>
-            <mat-icon *ngIf="player.value.connected" class="mat-accent">done</mat-icon>
-            <span class="tab-header-text">{{ player.value.name }}</span>
+            <mat-icon *ngIf="player.connected" class="mat-accent">done</mat-icon>
+            <span class="tab-header-text">{{ player.name }}</span>
         </ng-template>
         <div class="tab-body">
-            <player-seat [player]="player.value"></player-seat>
+            <player-seat [player]="player" [readonly]="player.id !== you.id" (inventorySave)="onInventorySave($event)"></player-seat>
         </div>
     </mat-tab>
   </mat-tab-group>

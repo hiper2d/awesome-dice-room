@@ -1,5 +1,9 @@
+import {Inventory} from './inventory';
+
 export class Player {
   color: string;
+  inventory: Inventory = new Inventory();
+
   private system = false;
 
   constructor(
