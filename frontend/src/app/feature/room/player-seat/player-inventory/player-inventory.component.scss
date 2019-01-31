@@ -1,3 +1,23 @@
+.player-inventory {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.inventory-buttons {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mat-list-base {
+  padding-top: 0;
+}
+
+.inventory-items {
+  overflow-y: auto;
+}
+
 .inventory-item {
   display: flex;
   flex-direction: row;
