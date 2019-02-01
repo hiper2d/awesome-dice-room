@@ -1,8 +1,10 @@
 import {Inventory} from './inventory';
+import {Avatar} from '../util/avatar';
 
 export class Player {
   color: string;
   inventory: Inventory = new Inventory();
+  avatar: string;
 
   private system = false;
 
@@ -12,6 +14,11 @@ export class Player {
       public connected = true
   ) {
     this.color = Player.generateColor(id);
+    this.avatar = Avatar.getAvatar();
+  }
+
+  isSystem(): boolean {
+    return this.system;
   }
 
   private static generateColor(input: string): string {
@@ -31,9 +38,5 @@ export class Player {
     const player = new Player('0', 'System');
     player.system = true;
     return player;
-  }
-
-  isSystem(): boolean {
-    return this.system;
   }
 }
