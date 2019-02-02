@@ -1,4 +1,4 @@
-@import '~@angular/material/_theming';
+@import '../../../node_modules/@angular/material/theming';
 @include mat-core();
 
 $primary: mat-color(mat-palette($mat-purple));
