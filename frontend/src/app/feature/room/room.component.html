@@ -1,6 +1,12 @@
 <div class="play-area top">
+    <div class="full-width">
+        <button class="close-btn" mat-icon-button (click)="leaveRoom()" color="warn">
+            <mat-icon>cancel</mat-icon>
+        </button>
+    </div>
+
     <div class="chatbox" #chatbox>
-        <mat-list>
+        <mat-list class="full-size">
             <mat-list-item *ngFor="let msg of room?.messages.asArray()">
                 <room-message [message]="msg"></room-message>
             </mat-list-item>

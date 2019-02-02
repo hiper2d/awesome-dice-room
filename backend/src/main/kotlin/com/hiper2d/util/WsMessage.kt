@@ -1,0 +1,16 @@
+package com.hiper2d.util
+
+data class WsMessage(
+    val type: String,
+    val data: Any?,
+    val senderId: String
+)
+
+data class WsRoomMessage(
+    val type: String,
+    val roomId: String,
+    val data: Any?,
+    val senderId: String,
+    val direct: Boolean = false,
+    val to: String = ""
+)

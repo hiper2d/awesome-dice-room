@@ -1,7 +1,5 @@
-import {Component, Inject} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {RoomDialogInput} from '../../../model/room-dialog-input';
-import {RoomDialogOutput} from '../../../model/room-dialog-output';
+import {Component} from '@angular/core';
+import {MatDialogRef} from '@angular/material';
 
 @Component({
   selector: 'room-dialog',
@@ -11,11 +9,8 @@ import {RoomDialogOutput} from '../../../model/room-dialog-output';
 export class RoomDialogComponent {
   name: string;
 
-  constructor(
-    public dialogRef: MatDialogRef<RoomDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: RoomDialogInput
-  ) {}
+  constructor(private dialogRef: MatDialogRef<RoomDialogComponent>) {}
 
-  onAccept = () => this.dialogRef.close(new RoomDialogOutput(this.name, this.data.roomId));
+  onAccept = () => this.dialogRef.close(this.name);
   onNoClick = () => this.dialogRef.close();
 }

@@ -1,7 +1,4 @@
 <div class="player-seat">
-    <div class="avatar" [ngStyle]="{ 'background-image': 'url(' + player.avatar + ')' }"></div>
-
-    <div class="inventory">
-        <player-inventory [readonly]="readonly" [inventory]="player.inventory" (save)="onInventorySave($event)"></player-inventory>
-    </div>
+    <img src="{{player.avatar}}" alt="img"/>
+    <player-inventory class="full-width" [readonly]="readonly" [inventory]="player.inventory" (save)="onInventorySave($event)"></player-inventory>
 </div>

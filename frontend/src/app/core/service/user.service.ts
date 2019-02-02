@@ -5,6 +5,5 @@ import {UuidUtil} from '../../util/uuid.util';
   providedIn: 'root'
 })
 export class UserService {
-
   userId = UuidUtil.generateUuid();
 }

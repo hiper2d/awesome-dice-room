@@ -15,14 +15,24 @@ body {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACZJREFUeNpi/PTpEwMY8PLyMsFZnz9/ZoKzgAzG////Q1hAABBgAFeiDto+NxIZAAAAAElFTkSuQmCC");
   background-repeat: repeat;
 
+  .full-width {
+    width: 100%;
+  }
+
+  .full-size {
+    height: 100%;
+    width: 100%;
+  }
+
   .tab-body,
   .mat-tab-group,
   .mat-tab-body-wrapper {
     height: 100%;
   }
 
-  .full-size {
+  .mat-list {
     height: 100%;
     width: 100%;
+    padding: 0;
   }
 }

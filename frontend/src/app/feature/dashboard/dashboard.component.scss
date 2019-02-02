@@ -10,3 +10,30 @@
 button {
   margin: 10px;
 }
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  background-color: #393939;
+  color: #fff;
+
+  &-room,
+  &-buttons {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &-room-name {
+    width: 400px;
+    height: 60px;
+    line-height: 60px;
+  }
+
+  .mat-list {
+    overflow-y: auto;
+  }
+
+  .mat-list-item {
+    height: auto;
+  }
+}

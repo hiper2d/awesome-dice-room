@@ -3,10 +3,11 @@ import {RoomMessage} from './room-message';
 import {Queue} from '../util/queue';
 
 export class Room {
+  messages: Queue<RoomMessage> = new Queue(100);
+  players = new Map<string, Player>();
+
   constructor(
-      public id: string,
-      public players = new Map<string, Player>(),
-      public messages: Queue<RoomMessage> = new Queue(10)
+      public id: string
   ) {}
 
   addPlayer = (player: Player) => this.players.set(player.id, player);

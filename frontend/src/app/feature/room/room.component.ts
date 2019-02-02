@@ -1,37 +1,37 @@
 import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {WsUtil} from '../../util/ws.util';
 import {MatDialog} from '@angular/material';
 import {RoomDialogComponent} from './room-dialog/room-dialog.component';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {Room} from '../../model/room';
 import {UserService} from '../../core/service/user.service';
 import {WsMessage, WsMessageParam} from '../../model/ws-message';
-import {WsMessageType} from '../../util/ws-message-type';
+import {WsRoomMessageType} from '../../util/web-socket/ws-message-type';
 import {Player} from '../../model/player';
-import {flatMap, map} from 'rxjs/operators';
-import {RoomDialogOutput} from '../../model/room-dialog-output';
-import {RoomDialogInput} from '../../model/room-dialog-input';
 import {Inventory} from '../../model/inventory';
+import {WithWebSocket} from '../../util/web-socket/with-web-socket';
+import {DashboardService} from '../../core/service/dashboard.service';
+import {roomTopic} from '../../util/web-socket/constants';
 
 @Component({
   selector: 'room',
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss']
 })
-export class RoomComponent implements OnInit, OnDestroy {
+export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   @ViewChild('chatbox') chatbox: ElementRef;
   message = '';
   room: Room;
   you: Player;
 
-  private wsConnection: WebSocket;
-
   constructor(
-    private userService: UserService,
+    userService: UserService,
+    private dashboardService: DashboardService,
     private router: Router,
     private dialog: MatDialog,
     private route: ActivatedRoute
-  ) {}
+  ) {
+    super(userService);
+  }
 
   @HostListener('window:beforeunload')
   onGlobalExit() {
@@ -39,38 +39,40 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    setTimeout(() => { // hack to avoid 'value has been changed before check'
-      this.route.paramMap.pipe(
-        map((params: ParamMap) => params.get('roomId')),
-        flatMap(roomId => this.dialog.open(RoomDialogComponent, new RoomDialogInput(roomId)).afterClosed()),
-      ).subscribe( (dialogData: RoomDialogOutput) => {
-        if (!dialogData) {
-          this.router.navigate(['/']);
-        } else {
-          this.room = new Room(dialogData.roomId);
-          this.you = new Player(this.userService.userId, dialogData.name);
-          this.room.addPlayer(this.you);
-          this.wsConnection = WsUtil.connect(this.room.id, this.getWsMessageCallback());
-          this.wsConnection.onopen = () => this.notifyOtherClientsThatYouJoined();
-        }
+    this.route.paramMap.subscribe(params => {
+      const roomId = params.get('roomId');
+
+      if (this.dashboardService.roomIds.indexOf(roomId) === -1) {
+        this.leaveRoom();
+        return;
+      }
+
+      setTimeout(() => { // hack to avoid 'value has been changed before check'
+        this.dialog.open(RoomDialogComponent).afterClosed().subscribe( (name: string) => {
+          if (!name) {
+            this.leaveRoom();
+          } else {
+            this.room = new Room(roomId);
+            this.you = new Player(this.userService.userId, name);
+            this.room.addPlayer(this.you);
+            this.connect(`${roomTopic}${this.room.id}`);
+          }
+        });
       });
     });
   }
 
   ngOnDestroy() {
-    this.sendMessage({ type: WsMessageType.DISCONNECT });
+    if (this.wsConnection) {
+      this.disconnect();
+    }
   }
 
   onSendMessage() {
     if (this.message) {
-      this.sendMessage({ type: WsMessageType.CHAT_MESSAGE, data: this.message });
+      this.sendMessage({ type: WsRoomMessageType.CHAT_MESSAGE, data: this.message });
       this.message = '';
     }
-  }
-
-  notifyOtherClientsThatYouJoined() {
-    this.sendMessage({ type: WsMessageType.HI_I_AM_NEW_HERE, data: this.you.name });
-    this.room.pushMessage('Connected');
   }
 
   getPlayers(): Array<Player> {
@@ -78,64 +80,75 @@ export class RoomComponent implements OnInit, OnDestroy {
       .sort((a, b) => a.id === this.you.id ? -1 : 0);
   }
 
-  onInventorySave = (inventory: Inventory) => this.sendMessage({ type: WsMessageType.INVENTORY, data: inventory });
+  onInventorySave = (inventory: Inventory) => this.sendMessage({ type: WsRoomMessageType.INVENTORY, data: inventory });
 
-  private getWsMessageCallback(): (any) => void {
-    return (result) => {
-      const message = JSON.parse(result.data) as WsMessage;
-
-      switch (message.type) {
-        case WsMessageType.ROLL:
-          this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name}'s Roll result is ${message.data}`);
-          break;
-
-        case WsMessageType.HI_I_AM_NEW_HERE:
-          if (message.senderId !== this.userService.userId) {
-            this.room.addPlayer(new Player(message.senderId, message.data));
-            this.room.pushMessage(`${message.data} joined room`);
-            this.sendMessage({
-              type: WsMessageType.NICE_TO_MEET_YOU,
-              data: this.you.name,
-              direct: true,
-              to: message.senderId
-            });
-          }
-          break;
-
-        case WsMessageType.NICE_TO_MEET_YOU:
-          if (message.direct && message.to === this.userService.userId) {
-            this.room.addPlayer(new Player(message.senderId, message.data));
-            this.room.pushMessage(`${message.data} already connected`);
-          }
-          break;
-
-        case WsMessageType.CHAT_MESSAGE:
-          this.room.pushMessage(message.data, this.room.getPlayerById(message.senderId));
-          break;
-
-        case WsMessageType.DISCONNECT:
-          this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name} disconnected`);
-          this.room.getPlayerById(message.senderId).connected = false;
-          break;
-
-        case WsMessageType.INVENTORY:
-          const inventory: Inventory = message.data;
-          const items = inventory.items.reduce((acc, i) => `${acc}<br/> name: ${i.name} description: ${i.description}`, '');
-          this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name}'s items :<br/>${items}`);
-
-          if (this.you.id !== message.senderId) {
-            this.room.players.get(message.senderId).inventory = message.data;
-          }
-          break;
-      }
-
-      setTimeout(() => this.chatbox.nativeElement.scrollTop = this.chatbox.nativeElement.scrollHeight);
-    };
-  }
-
-  private sendMessage(params: WsMessageParam) {
-    if (this.room) {
-      WsUtil.send(this.wsConnection, { roomId: this.room.id, senderId: this.userService.userId, ...params });
+  leaveRoom() {
+    if (this.wsConnection) {
+      this.onClose();
     }
+
+    this.router.navigate(['/']);
   }
+
+  protected onMessage(result) {
+    const message = JSON.parse(result.data) as WsMessage;
+
+    switch (message.type) {
+      case WsRoomMessageType.ROLL:
+        this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name}'s Roll result is ${message.data}`);
+        break;
+
+      case WsRoomMessageType.HI_I_AM_NEW_HERE:
+        if (message.senderId !== this.userService.userId) {
+          this.room.addPlayer(Player.newPlayer(message.data));
+          this.room.pushMessage(`${message.data.name} joined room`);
+          this.sendMessage({
+            type: WsRoomMessageType.NICE_TO_MEET_YOU,
+            data: this.you,
+            direct: true,
+            to: message.senderId
+          });
+        }
+        break;
+
+      case WsRoomMessageType.NICE_TO_MEET_YOU:
+        if (message.direct && message.to === this.userService.userId) {
+          this.room.addPlayer(Player.newPlayer(message.data));
+          this.room.pushMessage(`${message.data.name} already connected`);
+        }
+        break;
+
+      case WsRoomMessageType.CHAT_MESSAGE:
+        this.room.pushMessage(message.data, this.room.getPlayerById(message.senderId));
+        break;
+
+      case WsRoomMessageType.DISCONNECT:
+        this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name} disconnected`);
+        this.room.getPlayerById(message.senderId).connected = false;
+        break;
+
+      case WsRoomMessageType.INVENTORY:
+        const inventory: Inventory = message.data;
+        const items = inventory.items.reduce((acc, i) => `${acc}<br/> name: ${i.name} description: ${i.description}`, '');
+        this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name}'s items :<br/>${items}`);
+
+        if (this.you.id !== message.senderId) {
+          this.room.players.get(message.senderId).inventory = message.data;
+        }
+        break;
+    }
+
+    setTimeout(() => this.chatbox.nativeElement.scrollTop = this.chatbox.nativeElement.scrollHeight);
+  }
+
+  protected onOpen() {
+    this.sendMessage({ type: WsRoomMessageType.HI_I_AM_NEW_HERE, data: this.you });
+    this.room.pushMessage('Connected');
+  }
+
+  protected onClose() {
+    this.sendMessage({ type: WsRoomMessageType.DISCONNECT });
+  }
+
+  private sendMessage = (params: WsMessageParam) => this.send({ roomId: this.room.id, ...params });
 }
