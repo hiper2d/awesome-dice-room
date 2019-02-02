@@ -47,19 +47,34 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
         return;
       }
 
-      setTimeout(() => { // hack to avoid 'value has been changed before check'
-        this.dialog.open(RoomDialogComponent).afterClosed().subscribe( (name: string) => {
-          if (!name) {
-            this.leaveRoom();
-          } else {
-            this.room = new Room(roomId);
-            this.you = new Player(this.userService.userId, name);
-            this.room.addPlayer(this.you);
-            this.connect(`${WsConstants.roomTopic}${this.room.id}`);
-          }
+      this.room = new Room(roomId);
+
+      const myPlayer = this.dashboardService.getPlayer(roomId);
+      if (myPlayer) {
+        this.init(myPlayer);
+      } else {
+        setTimeout(() => { // hack to avoid 'value has been changed before check'
+          this.dialog.open(RoomDialogComponent).afterClosed().subscribe(this.onDialogClose(roomId));
         });
-      });
+      }
     });
+  }
+
+  private init(player: Player) {
+    this.you = player;
+    this.room.addPlayer(this.you);
+    this.connect(`${WsConstants.roomTopic}${this.room.id}`);
+  }
+
+  private onDialogClose(roomId: string) {
+    return (name: string) => {
+      if (!name) {
+        this.leaveRoom();
+      } else {
+        this.init(new Player(this.userService.userId, name));
+        this.dashboardService.addPlayer(roomId, this.you);
+      }
+    };
   }
 
   ngOnDestroy() {

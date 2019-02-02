@@ -1,7 +1,8 @@
-<div class="room-message">
-   <div>{{message.timestamp}}</div>
-   <div class="room-message-author" [ngClass]="getAuthorClass()">{{ message.author.name }}</div>
-   <div>
-      <div class="message" [ngClass]="getMessageClass()" [innerHTML]="sanitizedMessage"></div>
-   </div>
+<div class="room-message full-width">
+   <tr>
+      <td><div>{{message.timestamp}}</div></td>
+      <td><img src="{{message.author.avatar}}" alt="img"></td>
+      <td><div class="room-message-author" [ngClass]="getAuthorClass()">{{ message.author.name }}</div></td>
+      <td><div class="message" [ngClass]="getMessageClass()" [innerHTML]="sanitizedMessage"></div></td>
+   </tr>
 </div>
