@@ -13,20 +13,20 @@ export class RoomMessageComponent implements OnInit {
 
     constructor(private sanitizer: DomSanitizer) {}
 
-    getAuthorStyle() {
-        return {
-            color: this.message.author.isSystem() && 'red' || `#${this.message.author.color}`
-        };
-    }
-
-    getMessageStyle() {
-        return {
-            color: this.message.author.isSystem() && 'red',
-            'word-break': 'break-all'
-        };
-    }
-
     ngOnInit(): void {
         this.sanitizedMessage = this.sanitizer.sanitize(SecurityContext.HTML, this.message.body);
+    }
+
+    getAuthorClass() {
+        return {
+            system: this.message.author.isSystem(),
+            [this.message.author.color]: !this.message.author.isSystem()
+        };
+    }
+
+    getMessageClass() {
+        return {
+            system: this.message.author.isSystem()
+        };
     }
 }
