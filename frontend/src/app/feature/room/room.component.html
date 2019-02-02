@@ -7,7 +7,7 @@
 
     <div class="chatbox" #chatbox>
         <mat-list class="full-size">
-            <mat-list-item *ngFor="let msg of room?.messages.asArray()">
+            <mat-list-item *ngFor="let msg of messages.asArray()">
                 <room-message class="full-width" [message]="msg"></room-message>
             </mat-list-item>
         </mat-list>
@@ -20,7 +20,7 @@
 
 <div class="play-area bottom">
   <mat-tab-group color="accent">
-    <mat-tab *ngFor="let player of getPlayers()" [label]="player.name">
+    <mat-tab *ngFor="let player of playersObj | async" [label]="player.name">
         <ng-template mat-tab-label>
             <mat-icon *ngIf="player.connected" class="mat-accent">done</mat-icon>
             <span class="tab-header-text">{{ player.name }}</span>

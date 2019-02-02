@@ -1,3 +1,5 @@
+import {NumberUtil} from './number.util';
+
 const COLORS = [
   'pink',
   'purple',
@@ -21,7 +23,7 @@ const COLORS = [
 
 export class Color {
   static getColor(): string {
-    const idx = Math.floor(Math.random() * COLORS.length);
+    const idx = NumberUtil.rand(COLORS.length);
     return COLORS[idx];
   }
 }

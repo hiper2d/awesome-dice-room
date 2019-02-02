@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
-import {UuidUtil} from '../../util/uuid.util';
+import {Generator} from '../../util/generator';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  userId = UuidUtil.generateUuid();
+  id = Generator.uuid();
+  name = Generator.str(10); // todo: each user should have a username, Issue #7
 }

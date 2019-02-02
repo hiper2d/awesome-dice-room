@@ -1,6 +1,4 @@
 import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {MatDialog} from '@angular/material';
-import {RoomDialogComponent} from './room-dialog/room-dialog.component';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Room} from '../../model/room';
 import {UserService} from '../../core/service/user.service';
@@ -9,8 +7,13 @@ import {WsRoomMessageType} from '../../util/web-socket/ws-message-type';
 import {Player} from '../../model/player';
 import {Inventory} from '../../model/inventory';
 import {WithWebSocket} from '../../util/web-socket/with-web-socket';
-import {DashboardService} from '../../core/service/dashboard.service';
+import {RoomService} from '../../core/service/room.service';
 import {ApiConst} from '../../util/api.const';
+import {PlayerService} from '../../core/service/player.service';
+import {BehaviorSubject} from 'rxjs';
+import {Queue} from '../../util/queue';
+import {RoomMessage} from '../../model/room-message';
+import {map, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'room',
@@ -18,16 +21,22 @@ import {ApiConst} from '../../util/api.const';
   styleUrls: ['./room.component.scss']
 })
 export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
+
   @ViewChild('chatbox') chatbox: ElementRef;
+  messages: Queue<RoomMessage> = new Queue(100);
   message = '';
   room: Room;
   you: Player;
 
+  private players: Array<Player> = [];
+  private playersSbj = new BehaviorSubject<Array<Player>>([]);
+  playersObj = this.playersSbj.asObservable();
+
   constructor(
     userService: UserService,
-    private dashboardService: DashboardService,
+    private roomService: RoomService,
+    private playerService: PlayerService,
     private router: Router,
-    private dialog: MatDialog,
     private route: ActivatedRoute
   ) {
     super(userService);
@@ -39,42 +48,28 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
-      const roomId = params.get('roomId');
-      this.dashboardService.getRoom(roomId).subscribe(room => {
-        if (!room) {
-          this.leaveRoom();
-          return;
-        }
-
-        this.room = room;
-        const myPlayer = this.dashboardService.getPlayer(roomId);
-        if (myPlayer) {
-          this.init(myPlayer);
-        } else {
-          setTimeout(() => { // hack to avoid 'value has been changed before check'
-            this.dialog.open(RoomDialogComponent).afterClosed().subscribe(this.onDialogClose(roomId));
-          });
-        }
-      });
-    });
+    this.route.paramMap.pipe(
+      map(params => params.get('roomId')),
+      tap(roomId => this.loadRoom(roomId))
+    ).subscribe();
   }
 
-  private init(player: Player) {
-    this.you = player;
-    this.room.addPlayer(this.you);
-    this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
-  }
-
-  private onDialogClose(roomId: string) {
-    return (name: string) => {
-      if (!name) {
+  private loadRoom(id: string) {
+    this.roomService.getRoom(id).subscribe(room => {
+      console.log(room);
+      if (!room) {
         this.leaveRoom();
-      } else {
-        this.init(new Player(this.userService.userId, name));
-        this.dashboardService.addPlayer(roomId, this.you);
+        return;
       }
-    };
+
+      this.room = room;
+      this.you = new Player(this.userService.id, this.userService.name);
+      this.addPlayer(this.you);
+      this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
+
+      // No need to show dialog because users have names after login
+      // this.dialog.open(RoomDialogComponent).afterClosed().subscribe(this.onDialogClose(id));
+    });
   }
 
   ngOnDestroy() {
@@ -110,13 +105,13 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
 
     switch (message.type) {
       case WsRoomMessageType.ROLL:
-        this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name}'s Roll result is ${message.data}`);
+        this.pushMessage(`${this.getPlayerById(message.senderId).name}'s Roll result is ${message.data}`);
         break;
 
       case WsRoomMessageType.HI_I_AM_NEW_HERE:
-        if (message.senderId !== this.userService.userId) {
-          this.room.addPlayer(Player.newPlayer(message.data));
-          this.room.pushMessage(`${message.data.name} joined room`);
+        if (message.senderId !== this.userService.id) {
+          this.addPlayer(Player.newPlayer(message.data));
+          this.pushMessage(`${message.data.name} joined room`);
           this.sendMessage({
             type: WsRoomMessageType.NICE_TO_MEET_YOU,
             data: this.you,
@@ -127,25 +122,25 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
         break;
 
       case WsRoomMessageType.NICE_TO_MEET_YOU:
-        if (message.direct && message.to === this.userService.userId) {
-          this.room.addPlayer(Player.newPlayer(message.data));
-          this.room.pushMessage(`${message.data.name} already connected`);
+        if (message.direct && message.to === this.userService.id) {
+          this.addPlayer(Player.newPlayer(message.data));
+          this.pushMessage(`${message.data.name} already connected`);
         }
         break;
 
       case WsRoomMessageType.CHAT_MESSAGE:
-        this.room.pushMessage(message.data, this.room.getPlayerById(message.senderId));
+        this.pushMessage(message.data, this.getPlayerById(message.senderId));
         break;
 
       case WsRoomMessageType.DISCONNECT:
-        this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name} disconnected`);
-        this.room.getPlayerById(message.senderId).connected = false;
+        this.pushMessage(`${this.getPlayerById(message.senderId).name} disconnected`);
+        this.getPlayerById(message.senderId).connected = false;
         break;
 
       case WsRoomMessageType.INVENTORY:
         const inventory: Inventory = message.data;
         const items = inventory.items.reduce((acc, i) => `${acc}<br/> name: ${i.name} description: ${i.description}`, '');
-        this.room.pushMessage(`${this.room.getPlayerById(message.senderId).name}'s items :<br/>${items}`);
+        this.pushMessage(`${this.getPlayerById(message.senderId).name}'s items :<br/>${items}`);
 
         if (this.you.id !== message.senderId) {
           this.room.players.get(message.senderId).inventory = message.data;
@@ -158,7 +153,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
 
   protected onOpen() {
     this.sendMessage({ type: WsRoomMessageType.HI_I_AM_NEW_HERE, data: this.you });
-    this.room.pushMessage('Connected');
+    this.pushMessage('Connected');
   }
 
   protected onClose() {
@@ -166,4 +161,17 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   }
 
   private sendMessage = (params: WsMessageParam) => this.send({ roomId: this.room.id, ...params });
+
+  private addPlayer(player: Player) {
+    this.players.push(player);
+    this.playersSbj.next(this.players);
+  }
+
+  private getPlayerById(id: string) {
+    return this.players.find(p => p.id === id);
+  }
+
+  private pushMessage(message: string, author: Player = Player.systemPlayer(), timestamp: string = new Date().toLocaleTimeString()) {
+    this.messages.push(new RoomMessage(message, author, timestamp));
+  }
 }
