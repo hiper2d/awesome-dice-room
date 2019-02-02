@@ -1,3 +1,5 @@
+import {NumberUtil} from './number.util';
+
 const AVATARS = [
   'hunter',
   'mage',
@@ -12,7 +14,7 @@ const getPath = (name: string) => `assets/avatars/${name}.png`;
 
 export class Avatar {
   static getAvatar () {
-    const idx = Math.floor(Math.random() * AVATARS.length);
+    const idx = NumberUtil.rand(AVATARS.length);
     return getPath(AVATARS[idx]);
   }
 }

@@ -1,11 +1,11 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import {DashboardService} from '../../core/service/dashboard.service';
+import {RoomService} from '../../core/service/room.service';
 import {WithWebSocket} from '../../util/web-socket/with-web-socket';
 import {WsMessage} from '../../model/ws-message';
 import {WsDashboardMessageType} from '../../util/web-socket/ws-message-type';
 import {UserService} from '../../core/service/user.service';
-import {UuidUtil} from '../../util/uuid.util';
+import {Generator} from '../../util/generator';
 import {Room} from '../../model/room';
 import {BehaviorSubject} from 'rxjs';
 import {tap} from 'rxjs/operators';
@@ -24,7 +24,7 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
 
   constructor(
     private router: Router,
-    public dashboardService: DashboardService,
+    public roomService: RoomService,
     userService: UserService
   ) {
     super(userService);
@@ -44,16 +44,9 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
     this.disconnect();
   }
 
-  private loadRooms() {
-    this.dashboardService.allRooms().subscribe(rooms => {
-      this.rooms = rooms;
-      this.roomsSbj.next(rooms);
-    });
-  }
-
   addRoom() {
-    const newRoom = new Room(UuidUtil.generateUuid());
-    this.dashboardService.createRoom(newRoom)
+    const newRoom = new Room(Generator.uuid());
+    this.roomService.createRoom(newRoom)
       .pipe(
         tap(createdRoom => {
           this.rooms.unshift(createdRoom);
@@ -64,7 +57,7 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   }
 
   removeRoom(id: string) {
-    this.dashboardService.deleteRoom(id)
+    this.roomService.deleteRoom(id)
       .pipe(tap(() => {
         this.rooms.splice(this.rooms.map(r => r.id).indexOf(id), 1);
         this.roomsSbj.next(this.rooms);
@@ -73,14 +66,20 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   }
 
   openRoom(roomId: string) {
-    this.disconnect();
     this.router.navigate(['/room', roomId]);
+  }
+
+  private loadRooms() {
+    this.roomService.allRooms().subscribe(rooms => {
+      this.rooms = rooms;
+      this.roomsSbj.next(rooms);
+    });
   }
 
   protected onMessage(result) {
     const message = JSON.parse(result.data) as WsMessage;
 
-    if (message.senderId === this.userService.userId) {
+    if (message.senderId === this.userService.id) {
       return;
     }
 
