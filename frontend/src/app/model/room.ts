@@ -7,7 +7,8 @@ export class Room {
   players = new Map<string, Player>();
 
   constructor(
-      public id: string
+      public id: string,
+      public name: string = 'awesome' // todo: should be done in a dialog, Issue #27
   ) {}
 
   addPlayer = (player: Player) => this.players.set(player.id, player);

@@ -5,13 +5,13 @@
         </button>
     </div>
     <mat-list>
-        <mat-list-item *ngFor="let roomId of service.roomIds">
+        <mat-list-item *ngFor="let room of roomsObs | async">
             <div class="dashboard-room full-size">
-                <div class="dashboard-room-name">Room {{roomId}}</div>
-                <button mat-icon-button (click)="openRoom(roomId)" color="accent">
+                <div class="dashboard-room-name">Room {{ room.id }}</div>
+                <button mat-icon-button (click)="openRoom(room.id)" color="accent">
                     <mat-icon>forward</mat-icon>
                 </button>
-                <button mat-icon-button (click)="removeRoom(roomId)" color="warn">
+                <button mat-icon-button (click)="removeRoom(room.id)" color="warn">
                     <mat-icon>remove_circle</mat-icon>
                 </button>
             </div>
