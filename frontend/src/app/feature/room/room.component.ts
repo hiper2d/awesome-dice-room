@@ -10,7 +10,7 @@ import {Player} from '../../model/player';
 import {Inventory} from '../../model/inventory';
 import {WithWebSocket} from '../../util/web-socket/with-web-socket';
 import {DashboardService} from '../../core/service/dashboard.service';
-import {WsConstants} from '../../util/web-socket/ws-constants';
+import {ApiConst} from '../../util/api.const';
 
 @Component({
   selector: 'room',
@@ -63,7 +63,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   private init(player: Player) {
     this.you = player;
     this.room.addPlayer(this.you);
-    this.connect(`${WsConstants.roomTopic}${this.room.id}`);
+    this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
   }
 
   private onDialogClose(roomId: string) {

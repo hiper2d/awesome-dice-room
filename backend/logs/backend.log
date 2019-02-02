@@ -557,3 +557,6 @@ Caused by: org.springframework.beans.factory.support.BeanDefinitionOverrideExcep
 2019-02-02 12:13:36.185  INFO arch - [           main] o.s.b.w.e.n.NettyWebServer               : Netty started on port(s): 8080
 2019-02-02 12:13:36.190  INFO arch - [           main] c.h.ApplicationKt                        : Started ApplicationKt in 5.035 seconds (JVM running for 7.799)
 2019-02-02 12:35:01.112  INFO arch - [ntLoopGroup-2-2] o.m.d.connection                         : Opened connection [connectionId{localValue:3, serverValue:16}] to localhost:27017
+2019-02-02 13:51:39.677 ERROR arch - [or-http-epoll-2] r.n.t.TcpServer                          : [id: 0xe2f413d2, L:/0:0:0:0:0:0:0:1%0:8080 - R:/0:0:0:0:0:0:0:1%0:46084] onUncaughtException(SimpleConnection{channel=[id: 0xe2f413d2, L:/0:0:0:0:0:0:0:1%0:8080 - R:/0:0:0:0:0:0:0:1%0:46084]})
+io.netty.channel.unix.Errors$NativeIoException: syscall:read(..) failed: Connection reset by peer
+	at io.netty.channel.unix.FileDescriptor.readAddress(..)(Unknown Source)
