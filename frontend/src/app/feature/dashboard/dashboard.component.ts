@@ -6,10 +6,10 @@ import {WsMessage} from '../../model/ws-message';
 import {WsDashboardMessageType} from '../../util/web-socket/ws-message-type';
 import {UserService} from '../../core/service/user.service';
 import {UuidUtil} from '../../util/uuid.util';
-import {WsConstants} from '../../util/web-socket/ws-constants';
 import {Room} from '../../model/room';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {tap} from 'rxjs/operators';
+import {ApiConst} from '../../util/api.const';
 
 @Component({
   selector: 'dashboard',
@@ -32,7 +32,7 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
 
   ngOnInit(): void {
     this.loadRooms();
-    this.connect(WsConstants.dashboardTopic);
+    this.connect(ApiConst.WS_DASHBOARD);
   }
 
   @HostListener('window:beforeunload')

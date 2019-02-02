@@ -1,14 +1,14 @@
 import {WsMessage, WsMessageParam} from '../../model/ws-message';
 import {UserService} from '../../core/service/user.service';
-import {WsConstants} from './ws-constants';
+import {ApiConst} from '../api.const';
 
 export abstract class WithWebSocket {
   protected wsConnection: WebSocket;
 
-  constructor(protected userService: UserService) {}
+  protected constructor(protected userService: UserService) {}
 
   protected connect(topic: string) {
-    this.wsConnection = new WebSocket(`${WsConstants.hostUrl}${topic}`);
+    this.wsConnection = new WebSocket(`${ApiConst.WS_HOST}/${topic}`);
     this.wsConnection.onmessage = (result) => this.onMessage(result);
     this.wsConnection.onopen = () => this.onOpen();
     this.wsConnection.onclose = () => this.onClose();
