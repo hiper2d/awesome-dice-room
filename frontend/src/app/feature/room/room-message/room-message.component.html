@@ -1,7 +1,7 @@
 <div class="room-message">
    <div>{{message.timestamp}}</div>
-   <div class="rm-author" [ngStyle]="getAuthorStyle()">{{ message.author.name }}</div>
+   <div class="room-message-author" [ngClass]="getAuthorClass()">{{ message.author.name }}</div>
    <div>
-      <div [ngStyle]="getMessageStyle()" [innerHTML]="sanitizedMessage"></div>
+      <div class="message" [ngClass]="getMessageClass()" [innerHTML]="sanitizedMessage"></div>
    </div>
 </div>

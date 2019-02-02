@@ -6,7 +6,7 @@ import {WsMessage} from '../../model/ws-message';
 import {WsDashboardMessageType} from '../../util/web-socket/ws-message-type';
 import {UserService} from '../../core/service/user.service';
 import {UuidUtil} from '../../util/uuid.util';
-import {dashboardTopic} from '../../util/web-socket/constants';
+import {WsConstants} from '../../util/web-socket/ws-constants';
 
 @Component({
   selector: 'dashboard',
@@ -23,7 +23,7 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   }
 
   ngOnInit(): void {
-    this.connect(dashboardTopic);
+    this.connect(WsConstants.dashboardTopic);
   }
 
   @HostListener('window:beforeunload')
