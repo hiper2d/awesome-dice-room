@@ -14,7 +14,10 @@
         <button mat-icon-button (click)="addItem()" color="accent">
             <mat-icon>add_circle</mat-icon>
         </button>
-        <button mat-icon-button [disabled]="!inventoryForm.valid || inventoryForm.pristine" (click)="onSave()" color="accent">
+        <button mat-icon-button
+                [disabled]="!inventoryForm.valid || inventoryForm.pristine"
+                (click)="onSave();inventoryForm.form.markAsPristine()"
+                color="accent">
             <mat-icon>save</mat-icon>
         </button>
     </div>

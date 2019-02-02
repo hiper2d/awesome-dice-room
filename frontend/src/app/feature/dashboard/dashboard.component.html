@@ -1,2 +1,20 @@
-<button mat-flat-button color="primary" (click)="openRoom('1')">Open a demo room 1</button>
-<button mat-flat-button color="primary" (click)="openRoom('2')">Open a demo room 2</button>
+<div class="dashboard full-size">
+    <div class="dashboard-buttons">
+        <button mat-icon-button (click)="addRoom()" color="accent">
+            <mat-icon>add_circle</mat-icon>
+        </button>
+    </div>
+    <mat-list>
+        <mat-list-item *ngFor="let roomId of service.roomIds">
+            <div class="dashboard-room full-size">
+                <div class="dashboard-room-name">Room {{roomId}}</div>
+                <button mat-icon-button (click)="openRoom(roomId)" color="accent">
+                    <mat-icon>forward</mat-icon>
+                </button>
+                <button mat-icon-button (click)="removeRoom(roomId)" color="warn">
+                    <mat-icon>remove_circle</mat-icon>
+                </button>
+            </div>
+        </mat-list-item>
+    </mat-list>
+</div>
