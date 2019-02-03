@@ -2,7 +2,8 @@ export class Room {
 
   constructor(
       public id: string,
-      public name: string = 'awesome', // todo: should be done in a dialog, Issue #27
+      public name: string,
+      public description?: string,
       public playerIds: Array<string> = []
   ) {}
 }

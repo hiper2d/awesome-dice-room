@@ -5,11 +5,12 @@ import {WithWebSocket} from '../../util/web-socket/with-web-socket';
 import {WsMessage} from '../../model/ws-message';
 import {WsDashboardMessageType} from '../../util/web-socket/ws-message-type';
 import {UserService} from '../../core/service/user.service';
-import {Generator} from '../../util/generator';
 import {Room} from '../../model/room';
 import {BehaviorSubject} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {ApiConst} from '../../util/api.const';
+import {MatDialog} from '@angular/material';
+import {DashboardDialogComponent} from './dashboard-dialog/dashboard-dialog.component';
 
 @Component({
   selector: 'dashboard',
@@ -23,8 +24,9 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   roomsObs = this.roomsSbj.asObservable();
 
   constructor(
-    private router: Router,
     public roomService: RoomService,
+    private router: Router,
+    private dialog: MatDialog,
     userService: UserService
   ) {
     super(userService);
@@ -45,15 +47,16 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   }
 
   addRoom() {
-    const newRoom = new Room(Generator.uuid());
-    this.roomService.createRoom(newRoom)
-      .pipe(
-        tap(createdRoom => {
-          this.rooms.unshift(createdRoom);
-          this.roomsSbj.next(this.rooms);
-        })
-      )
-      .subscribe(createdRoom => this.notifyOthers(createdRoom.id, WsDashboardMessageType.NEW_ROOM));
+      this.dialog.open(DashboardDialogComponent).afterClosed().subscribe((room: Room) => {
+        this.roomService.createRoom(room)
+            .pipe(
+                tap(createdRoom => {
+                  this.rooms.unshift(createdRoom);
+                  this.roomsSbj.next(this.rooms);
+                })
+            )
+            .subscribe(createdRoom => this.notifyOthers(createdRoom.id, WsDashboardMessageType.NEW_ROOM));
+      });
   }
 
   removeRoom(id: string) {
@@ -65,9 +68,7 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
       .subscribe(() => this.notifyOthers(id, WsDashboardMessageType.REMOVE_ROOM));
   }
 
-  openRoom(roomId: string) {
-    this.router.navigate(['/room', roomId]);
-  }
+  openRoom = (roomId: string) => this.router.navigate(['/room', roomId]);
 
   private loadRooms() {
     this.roomService.allRooms().subscribe(rooms => {

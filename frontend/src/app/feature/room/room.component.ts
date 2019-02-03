@@ -12,7 +12,7 @@ import {PlayerService} from '../../core/service/player.service';
 import {BehaviorSubject} from 'rxjs';
 import {Queue} from '../../util/queue';
 import {RoomMessage} from '../../model/room-message';
-import {flatMap, map, tap, throwIfEmpty} from 'rxjs/operators';
+import {flatMap, map, tap} from 'rxjs/operators';
 import {RoomFull} from '../../model/room-rull';
 import {ExceptionUtil} from '../../util/exception.util';
 
@@ -33,11 +33,11 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   playersObj = this.playersSbj.asObservable();
 
   constructor(
-    userService: UserService,
     private roomService: RoomService,
     private playerService: PlayerService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    userService: UserService
   ) {
     super(userService);
   }
@@ -70,7 +70,9 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.leaveRoom();
+    if (this.wsConnection) {
+      this.disconnect();
+    }
   }
 
   onSendMessage() {
@@ -84,11 +86,13 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
 
   leaveRoom() {
     if (this.wsConnection) {
-      this.onWsClose();
+      this.notifyAll({ type: WsRoomMessageType.DISCONNECT });
     }
+
     if (this.room && this.currentPlayer) {
-      this.roomService.removePlayerFromRoom(this.room.id, this.currentPlayer.id).subscribe(); // not sure about this, may not work stable
+      this.roomService.removePlayerFromRoom(this.room.id, this.currentPlayer.id);
     }
+
     this.router.navigate(['/']);
   }
 
@@ -97,22 +101,17 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     this.pushMessageToChat('Connected');
   }
 
-  protected onWsClose() {
-    this.notifyAll({ type: WsRoomMessageType.DISCONNECT });
-  }
-
   protected onMessage(result) {
     const message = JSON.parse(result.data) as WsMessage;
 
     switch (message.type) {
       case WsRoomMessageType.ROLL:
-        this.pushMessageToChat(`${this.getPlayerByUser(message.senderId).name}'s Roll result is ${message.data}`);
+        this.pushMessageToChat(`${this.getPlayerByUserId(message.senderId).name}'s Roll result is ${message.data}`);
         break;
 
       case WsRoomMessageType.HI_I_AM_NEW_HERE:
         if (!this.isMyOwnMessage(message)) {
-          const joinedPlayerId = message.senderId;
-          this.playerService.getPlayer(joinedPlayerId).subscribe(p => {
+          this.playerService.getPlayer(message.senderId).subscribe(p => {
               this.addPlayerTab(Player.newPlayer(p));
               this.pushMessageToChat(`${p.name} joined room`);
             });
@@ -120,17 +119,17 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
         break;
 
       case WsRoomMessageType.CHAT_MESSAGE:
-        this.pushMessageToChat(message.data, this.getPlayerByUser(message.senderId));
+        this.pushMessageToChat(message.data, this.getPlayerByUserId(message.senderId));
         break;
 
       case WsRoomMessageType.DISCONNECT:
-        this.pushMessageToChat(`${this.getPlayerByUser(message.senderId).name} disconnected`);
+        this.pushMessageToChat(`${this.getPlayerByUserId(message.senderId).name} disconnected`);
         break;
 
       case WsRoomMessageType.INVENTORY:
         const inventory: Inventory = message.data;
         const items = inventory.items.reduce((acc, i) => `${acc}<br/> name: ${i.name} description: ${i.description}`, '');
-        this.pushMessageToChat(`${this.getPlayerByUser(message.senderId).name}'s items :<br/>${items}`);
+        this.pushMessageToChat(`${this.getPlayerByUserId(message.senderId).name}'s items :<br/>${items}`);
 
         if (!this.isMyOwnMessage(message)) {
           this.room.players.find(p => p.userId === this.currentPlayer.userId).inventory = message.data;
@@ -154,7 +153,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     }
   }
 
-  private getPlayerByUser(id: string) {
+  private getPlayerByUserId(id: string): Player {
     return this.room.players.find(p => p.id === id);
   }
 
