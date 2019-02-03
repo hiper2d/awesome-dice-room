@@ -2,6 +2,7 @@ package com.hiper2d.handler
 
 import com.hiper2d.model.Room
 import com.hiper2d.repository.RoomRepository
+import com.mongodb.client.result.UpdateResult
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -32,4 +33,18 @@ class RoomHandler(private val roomRepository: RoomRepository) {
     fun removeRoom(req: ServerRequest): Mono<ServerResponse> = ok()
         .contentType(MediaType.APPLICATION_JSON_UTF8)
         .body(roomRepository.deleteById(req.pathVariable("id")), Void::class.java)
+
+    fun addPlayerIdToRoom(req: ServerRequest): Mono<ServerResponse> = ok()
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .body(pushPlayerIdToRoom(req), Long::class.java)
+
+    fun removePlayerIdFromRoom(req: ServerRequest): Mono<ServerResponse> = ok()
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .body(pullPlayerIdFromRoom(req), Long::class.java)
+
+    private fun pushPlayerIdToRoom(req: ServerRequest) =
+        roomRepository.addPlayerIdToRoom(req.pathVariable("id"), req.pathVariable("playerId"))
+
+    private fun pullPlayerIdFromRoom(req: ServerRequest) =
+        roomRepository.removePlayerIdFromRoom(req.pathVariable("id"), req.pathVariable("playerId"))
 }
