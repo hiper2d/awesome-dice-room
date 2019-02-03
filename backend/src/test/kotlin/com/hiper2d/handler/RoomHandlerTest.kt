@@ -14,7 +14,7 @@ internal class RoomHandlerTest: BaseTest() {
     fun addRoom() {
         val room = Room(name = "Test Room")
         val roomStr = mapper.writeValueAsString(room)
-        val res = webClient.post().uri("/api/addRoom")
+        val res = webClient.post().uri("/api/rooms")
             .contentType(MediaType.APPLICATION_JSON_UTF8)
             .body(BodyInserters.fromPublisher(Mono.just(roomStr), String::class.java))
             .exchange()
