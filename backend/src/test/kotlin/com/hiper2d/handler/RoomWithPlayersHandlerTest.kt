@@ -13,49 +13,56 @@ internal class RoomWithPlayersHandlerTest: BaseTest() {
 
     @Test
     fun shouldUpdatePlayerIdsInRoom() {
+        val savedRoom = createRoom()
+
+        var updatedCount = addPlayerToRoom(savedRoom)
+        assertEquals(1, updatedCount)
+
+        var updatedRoom = getRoom(savedRoom)
+        assertEquals(3, updatedRoom.playerIds.size)
+        assertNotEquals(-1, updatedRoom.playerIds.indexOf("789"))
+
+        updatedCount = deletePlayerFromRoom(savedRoom)
+        assertEquals(1, updatedCount)
+
+        updatedRoom = getRoom(savedRoom)
+        assertEquals(2, updatedRoom.playerIds.size)
+        assertEquals(-1, updatedRoom.playerIds.indexOf("789"))
+    }
+
+    private fun deletePlayerFromRoom(savedRoom: Room): Long {
+        return webClient.delete().uri("/api/rooms/${savedRoom.id}/playerIds/789")
+            .exchange()
+            .returnResult(Long::class.java)
+            .responseBody
+            .blockFirst()!!
+    }
+
+    private fun getRoom(savedRoom: Room): Room {
+        return webClient.get().uri("/api/rooms/${savedRoom.id}")
+            .exchange()
+            .returnResult(Room::class.java)
+            .responseBody
+            .blockFirst()!!
+    }
+
+    private fun addPlayerToRoom(savedRoom: Room): Long {
+        return webClient.put().uri("/api/rooms/${savedRoom.id}/playerIds/789")
+            .exchange()
+            .returnResult(Long::class.java)
+            .responseBody
+            .blockFirst()!!
+    }
+
+    private fun createRoom(): Room {
         val room = Room(name = "Test Room", playerIds = listOf("123", "456"))
         val roomJson = mapper.writeValueAsString(room)
-
-        val savedRoom = webClient.post().uri("/api/rooms")
+        return webClient.post().uri("/api/rooms")
             .contentType(MediaType.APPLICATION_JSON_UTF8)
             .body(BodyInserters.fromPublisher(Mono.just(roomJson), String::class.java))
             .exchange()
             .returnResult(Room::class.java)
             .responseBody
             .blockFirst()!!
-
-        var updatedCount = webClient.put().uri("/api/rooms/${savedRoom.id}/playerIds/789")
-            .exchange()
-            .returnResult(Long::class.java)
-            .responseBody
-            .blockFirst()!!
-
-        assertEquals(1, updatedCount)
-
-        var updatedRoom = webClient.get().uri("/api/rooms/${savedRoom.id}")
-            .exchange()
-            .returnResult(Room::class.java)
-            .responseBody
-            .blockFirst()!!
-
-        assertEquals(3, updatedRoom.playerIds.size)
-        assertNotEquals(-1, updatedRoom.playerIds.indexOf("789"))
-
-        updatedCount = webClient.delete().uri("/api/rooms/${savedRoom.id}/playerIds/789")
-            .exchange()
-            .returnResult(Long::class.java)
-            .responseBody
-            .blockFirst()!!
-
-        assertEquals(1, updatedCount)
-
-        updatedRoom = webClient.get().uri("/api/rooms/${savedRoom.id}")
-            .exchange()
-            .returnResult(Room::class.java)
-            .responseBody
-            .blockFirst()!!
-
-        assertEquals(2, updatedRoom.playerIds.size)
-        assertEquals(-1, updatedRoom.playerIds.indexOf("789"))
     }
 }
