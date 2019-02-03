@@ -4,10 +4,12 @@ import com.hiper2d.BaseTest
 import com.hiper2d.model.Inventory
 import com.hiper2d.model.InventoryItem
 import com.hiper2d.model.Player
+import com.hiper2d.model.Room
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.http.MediaType
+import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 
