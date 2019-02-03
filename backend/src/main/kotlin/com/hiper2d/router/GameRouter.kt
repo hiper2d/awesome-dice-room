@@ -23,8 +23,11 @@ class GameRouter {
         DELETE("/api/rooms/{id}").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, roomHandler::removeRoom)
         }
+        PUT("/api/rooms").nest {
+            accept(MediaType.APPLICATION_JSON_UTF8, roomHandler::updateRoom)
+        }
         POST("/api/rooms").nest {
-            accept(MediaType.APPLICATION_JSON_UTF8, roomHandler::addRoom)
+            accept(MediaType.APPLICATION_JSON_UTF8, roomHandler::createRoom)
         }
     }
 

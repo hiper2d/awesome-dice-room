@@ -21,9 +21,13 @@ class RoomHandler(private val roomRepository: RoomRepository) {
         .contentType(MediaType.APPLICATION_JSON_UTF8)
         .body(roomRepository.findAll(), Room::class.java)
 
-    fun addRoom(req: ServerRequest): Mono<ServerResponse> = ok()
+    fun createRoom(req: ServerRequest): Mono<ServerResponse> = ok()
         .contentType(MediaType.APPLICATION_JSON_UTF8)
         .body(req.bodyToMono<Room>().flatMap { roomRepository.insert(it) }, Room::class.java)
+
+    fun updateRoom(req: ServerRequest): Mono<ServerResponse> = ok()
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .body(req.bodyToMono<Room>().flatMap { roomRepository.save(it) }, Room::class.java)
 
     fun removeRoom(req: ServerRequest): Mono<ServerResponse> = ok()
         .contentType(MediaType.APPLICATION_JSON_UTF8)
