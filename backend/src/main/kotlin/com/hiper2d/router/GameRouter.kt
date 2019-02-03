@@ -20,10 +20,10 @@ class GameRouter {
         GET("/api/rooms").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, roomHandler::allRooms)
         }
-        PUT("/api/rooms/{id}/playerIds/{playerId}").nest {
+        PUT("/api/rooms/{id}/playerId/{playerId}").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, roomHandler::addPlayerIdToRoom)
         }
-        DELETE("/api/rooms/{id}/playerIds/{playerId}").nest {
+        DELETE("/api/rooms/{id}/playerId/{playerId}").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, roomHandler::removePlayerIdFromRoom)
         }
         DELETE("/api/rooms/{id}").nest {

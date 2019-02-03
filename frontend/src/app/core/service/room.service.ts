@@ -27,6 +27,18 @@ export class RoomService extends AbstractService {
   }
 
   deleteRoom(id: string): Observable<void> {
-    return this.delete(`${ApiConst.API_ROOMS}/${id}`);
+    return this.delete<void>({ url: `${ApiConst.API_ROOMS}/${id}` });
+  }
+
+  updateRoom(room: Room): Observable<Room> {
+    return this.put<Room>({ url: ApiConst.API_ROOMS, body: room });
+  }
+
+  addPlayerToRoom(roomId: string, playerId: string) {
+    return this.put<number>({ url: `${ApiConst.API_ROOMS}/${roomId}/playerId/${playerId}` });
+  }
+
+  removePlayerFromRoom(roomId: string, playerId: string) {
+    return this.delete<number>({ url: `${ApiConst.API_ROOMS}/${roomId}/playerId/${playerId}` });
   }
 }

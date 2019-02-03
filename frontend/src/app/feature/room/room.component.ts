@@ -13,7 +13,7 @@ import {PlayerService} from '../../core/service/player.service';
 import {BehaviorSubject} from 'rxjs';
 import {Queue} from '../../util/queue';
 import {RoomMessage} from '../../model/room-message';
-import {map, tap} from 'rxjs/operators';
+import {flatMap, map, mergeMap, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'room',
@@ -50,40 +50,31 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   ngOnInit() {
     this.route.paramMap.pipe(
       map(params => params.get('roomId')),
-      tap(roomId => this.loadRoom(roomId))
-    ).subscribe();
-  }
-
-  private loadRoom(id: string) {
-    this.roomService.getRoom(id).subscribe(room => {
+      flatMap(roomId => this.roomService.getRoom(roomId))
+    ).subscribe(room => {
       if (!room) {
         this.leaveRoom();
         return;
+      } else {
+        this.setupRoom(room);
       }
+    });
+  }
 
-      this.room = room;
-
-      this.playerService.getPlayers(room.playerIds).subscribe(players => {
+  private setupRoom(room: Room) {
+    this.room = room;
+    this.playerService.getPlayers(room.playerIds)
+      .pipe(tap(players => {
         this.players = players;
         this.playersSbj.next(players);
-
+      }))
+      .subscribe(players => {
         if (this.userService.isInRoom(room.id)) {
-          const yourPlayerId = this.userService.getPlayerId(room.id);
-          this.you = this.players.find(p => p.id === yourPlayerId);
-          this.you.connected = true;
-          this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
+          this.takeYourExistingSeat(players, room);
         } else {
-          const newPlayer = new Player(null, this.userService.id, this.userService.name);
-          this.playerService.createPlayer(newPlayer).subscribe(createdPlayer => {
-            this.you = createdPlayer;
-            this.addPlayer(this.you);
-            this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
-          });
+          this.setupNewSeat(room);
         }
       });
-      // No need to show dialog because users have names after login
-      // this.dialog.open(RoomDialogComponent).afterClosed().subscribe(this.onDialogClose(id));
-    });
   }
 
   ngOnDestroy() {
@@ -120,26 +111,10 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
       case WsRoomMessageType.HI_I_AM_NEW_HERE:
         if (!this.isMyOwnMessage(message)) {
           const joinedPlayerId = message.data;
-          this.playerService.getPlayer(joinedPlayerId)
-            /*.pipe(tap(() => {
-              this.sendMessage({
-                type: WsRoomMessageType.NICE_TO_MEET_YOU,
-                data: this.you,
-                direct: true,
-                to: message.senderId
-              });
-            }))*/
-            .subscribe(p => {
-              this.addPlayer(Player.newPlayer(p));
+          this.playerService.getPlayer(joinedPlayerId).subscribe(p => {
+              this.addPlayerTab(Player.newPlayer(p));
               this.pushMessage(`${message.data.name} joined room`);
             });
-        }
-        break;
-
-      case WsRoomMessageType.NICE_TO_MEET_YOU:
-        if (message.direct && message.to === this.userService.id) {
-          this.addPlayer(Player.newPlayer(message.data));
-          this.pushMessage(`${message.data.name} already connected`);
         }
         break;
 
@@ -158,16 +133,12 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
         this.pushMessage(`${this.getPlayerById(message.senderId).name}'s items :<br/>${items}`);
 
         if (this.you.id !== message.senderId) {
-          this.room.players.get(message.senderId).inventory = message.data;
+          this.players.find(p => p.userId === this.you.userId).inventory = message.data;
         }
         break;
     }
 
     setTimeout(() => this.chatbox.nativeElement.scrollTop = this.chatbox.nativeElement.scrollHeight);
-  }
-
-  private isMyOwnMessage(message) {
-    return message.senderId !== this.userService.id;
   }
 
   protected onOpen() {
@@ -179,10 +150,35 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     this.sendMessage({ type: WsRoomMessageType.DISCONNECT });
   }
 
+  private takeYourExistingSeat(players: Array<Player>, room: Room) {
+    const yourPlayerId = this.userService.getPlayerId(room.id);
+    this.players = players;
+    this.playersSbj.next(players);
+    this.you = players.find(p => p.id === yourPlayerId);
+    this.you.connected = true;
+    this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
+  }
+
+  private setupNewSeat(room: Room) {
+    const newPlayer = new Player(null, this.userService.id, this.userService.name);
+    this.playerService.createPlayer(newPlayer)
+      .pipe(
+        tap(player => {
+          this.you = Player.newPlayer(player);
+          this.addPlayerTab(this.you);
+        }),
+        flatMap(player => this.roomService.addPlayerToRoom(room.id, player.id))
+      )
+      .subscribe(() => this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`));
+  }
+
+  private isMyOwnMessage(message) {
+    return message.senderId === this.userService.id;
+  }
+
   private sendMessage = (params: WsMessageParam) => this.send({ roomId: this.room.id, ...params });
 
-  private addPlayer(player: Player) {
-    // update players list in room
+  private addPlayerTab(player: Player) {
     this.players.push(player);
     this.playersSbj.next(this.players);
   }

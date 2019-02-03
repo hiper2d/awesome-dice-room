@@ -28,6 +28,6 @@ export class PlayerService extends AbstractService {
   }
 
   removePlayer(id: string): Observable<void> {
-    return this.delete(`${ApiConst.API_PLAYERS}/${id}`);
+    return this.delete<void>({ url: `${ApiConst.API_PLAYERS}/${id}` });
   }
 }

@@ -11,7 +11,7 @@ export class Player {
       public name: string,
       public connected = true,
       public color?: string,
-      public avatar?: string,
+      private avatar?: string,
       public inventory?: Inventory
   ) {
     this.color = color || Color.getColor();
