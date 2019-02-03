@@ -14,13 +14,16 @@ export class PlayerService extends AbstractService {
     super(http);
   }
 
-  getPlayers(ids: Array<string>): Observable<Player> {
-    let params = new HttpParams();
-    ids.forEach(id => params = params.append('ids', id));
-    return this.get<Player>(`${ApiConst.API_PLAYERS}`);
+  getPlayer(id: string): Observable<Player> {
+    return this.get<Player>(`${ApiConst.API_PLAYERS}/${id}`);
   }
 
-  addPlayer(player: Player): Observable<Player> {
+  getPlayers(ids: Array<string>): Observable<Array<Player>> {
+    const params = new HttpParams().set('ids', ids.join(','));
+    return this.get<Array<Player>>(`${ApiConst.API_PLAYERS}`, params);
+  }
+
+  createPlayer(player: Player): Observable<Player> {
     return this.post<Player>(ApiConst.API_PLAYERS, player);
   }
 

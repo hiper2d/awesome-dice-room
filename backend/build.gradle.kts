@@ -31,11 +31,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("com.lmax:disruptor:$disruptorVersion") // Log4j2 async appender
 
-    implementation("javax.xml.bind:jaxb-api:$jaxbVersion")
-    implementation("com.sun.xml.bind:jaxb-core:$jaxbVersion")
-    implementation("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
-    implementation("javax.activation:activation:$activationVersion")
-
     testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit")

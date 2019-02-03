@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.router
 
 @Configuration
-class RoomRouter {
+class GameRouter {
 
     @Bean
     fun roomRoute(roomHandler: RoomHandler): RouterFunction<ServerResponse> = router {

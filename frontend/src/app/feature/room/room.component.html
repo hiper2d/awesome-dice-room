@@ -7,7 +7,7 @@
 
     <div class="chatbox" #chatbox>
         <mat-list class="full-size">
-            <mat-list-item *ngFor="let msg of messages.asArray()">
+            <mat-list-item *ngFor="let msg of chatMessages.asArray()">
                 <room-message class="full-width" [message]="msg"></room-message>
             </mat-list-item>
         </mat-list>
