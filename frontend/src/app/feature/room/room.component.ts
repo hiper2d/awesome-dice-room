@@ -23,7 +23,7 @@ import {map, tap} from 'rxjs/operators';
 export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
 
   @ViewChild('chatbox') chatbox: ElementRef;
-  messages: Queue<RoomMessage> = new Queue(100);
+  chatMessages: Queue<RoomMessage> = new Queue(100);
   message = '';
   room: Room;
   you: Player;
@@ -56,17 +56,31 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
 
   private loadRoom(id: string) {
     this.roomService.getRoom(id).subscribe(room => {
-      console.log(room);
       if (!room) {
         this.leaveRoom();
         return;
       }
 
       this.room = room;
-      this.you = new Player(this.userService.id, this.userService.name);
-      this.addPlayer(this.you);
-      this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
 
+      this.playerService.getPlayers(room.playerIds).subscribe(players => {
+        this.players = players;
+        this.playersSbj.next(players);
+
+        if (this.userService.isInRoom(room.id)) {
+          const yourPlayerId = this.userService.getPlayerId(room.id);
+          this.you = this.players.find(p => p.id === yourPlayerId);
+          this.you.connected = true;
+          this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
+        } else {
+          const newPlayer = new Player(null, this.userService.id, this.userService.name);
+          this.playerService.createPlayer(newPlayer).subscribe(createdPlayer => {
+            this.you = createdPlayer;
+            this.addPlayer(this.you);
+            this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
+          });
+        }
+      });
       // No need to show dialog because users have names after login
       // this.dialog.open(RoomDialogComponent).afterClosed().subscribe(this.onDialogClose(id));
     });
@@ -83,11 +97,6 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
       this.sendMessage({ type: WsRoomMessageType.CHAT_MESSAGE, data: this.message });
       this.message = '';
     }
-  }
-
-  getPlayers(): Array<Player> {
-    return this.room && Array.from<Player>(this.room.players.values())
-      .sort((a, b) => a.id === this.you.id ? -1 : 0);
   }
 
   onInventorySave = (inventory: Inventory) => this.sendMessage({ type: WsRoomMessageType.INVENTORY, data: inventory });
@@ -109,15 +118,21 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
         break;
 
       case WsRoomMessageType.HI_I_AM_NEW_HERE:
-        if (message.senderId !== this.userService.id) {
-          this.addPlayer(Player.newPlayer(message.data));
-          this.pushMessage(`${message.data.name} joined room`);
-          this.sendMessage({
-            type: WsRoomMessageType.NICE_TO_MEET_YOU,
-            data: this.you,
-            direct: true,
-            to: message.senderId
-          });
+        if (!this.isMyOwnMessage(message)) {
+          const joinedPlayerId = message.data;
+          this.playerService.getPlayer(joinedPlayerId)
+            /*.pipe(tap(() => {
+              this.sendMessage({
+                type: WsRoomMessageType.NICE_TO_MEET_YOU,
+                data: this.you,
+                direct: true,
+                to: message.senderId
+              });
+            }))*/
+            .subscribe(p => {
+              this.addPlayer(Player.newPlayer(p));
+              this.pushMessage(`${message.data.name} joined room`);
+            });
         }
         break;
 
@@ -151,8 +166,12 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     setTimeout(() => this.chatbox.nativeElement.scrollTop = this.chatbox.nativeElement.scrollHeight);
   }
 
+  private isMyOwnMessage(message) {
+    return message.senderId !== this.userService.id;
+  }
+
   protected onOpen() {
-    this.sendMessage({ type: WsRoomMessageType.HI_I_AM_NEW_HERE, data: this.you });
+    this.sendMessage({ type: WsRoomMessageType.HI_I_AM_NEW_HERE, data: this.you.id });
     this.pushMessage('Connected');
   }
 
@@ -163,6 +182,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   private sendMessage = (params: WsMessageParam) => this.send({ roomId: this.room.id, ...params });
 
   private addPlayer(player: Player) {
+    // update players list in room
     this.players.push(player);
     this.playersSbj.next(this.players);
   }
@@ -172,6 +192,6 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   }
 
   private pushMessage(message: string, author: Player = Player.systemPlayer(), timestamp: string = new Date().toLocaleTimeString()) {
-    this.messages.push(new RoomMessage(message, author, timestamp));
+    this.chatMessages.push(new RoomMessage(message, author, timestamp));
   }
 }
