@@ -1,6 +1,12 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
+interface Args<T> {
+  url: string;
+  body?: T;
+  params?: HttpParams;
+}
+
 export abstract class AbstractService {
 
   protected constructor(private http: HttpClient) {}
@@ -13,8 +19,12 @@ export abstract class AbstractService {
     return this.http.post<T>(url, body, { params: params });
   }
 
-  protected delete(url: string, params?: HttpParams): Observable<void> {
-    return this.http.delete<void>(url, { params: params });
+  protected put<T>(args: Args<T>): Observable<T> {
+    return this.http.put<T>(args.url, args.body, { params: args.params });
+  }
+
+  protected delete<T>(args: Args<T>): Observable<T> {
+    return this.http.delete<T>(args.url, { params: args.params });
   }
 
   protected text(url: string): Observable<string> {

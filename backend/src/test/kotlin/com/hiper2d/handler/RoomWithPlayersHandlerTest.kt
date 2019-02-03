@@ -31,7 +31,7 @@ internal class RoomWithPlayersHandlerTest: BaseTest() {
     }
 
     private fun deletePlayerFromRoom(savedRoom: Room): Long {
-        return webClient.delete().uri("/api/rooms/${savedRoom.id}/playerIds/789")
+        return webClient.delete().uri("/api/rooms/${savedRoom.id}/playerId/789")
             .exchange()
             .returnResult(Long::class.java)
             .responseBody
@@ -47,7 +47,7 @@ internal class RoomWithPlayersHandlerTest: BaseTest() {
     }
 
     private fun addPlayerToRoom(savedRoom: Room): Long {
-        return webClient.put().uri("/api/rooms/${savedRoom.id}/playerIds/789")
+        return webClient.put().uri("/api/rooms/${savedRoom.id}/playerId/789")
             .exchange()
             .returnResult(Long::class.java)
             .responseBody

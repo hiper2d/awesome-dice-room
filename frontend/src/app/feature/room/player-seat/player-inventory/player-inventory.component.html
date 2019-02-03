@@ -23,7 +23,7 @@
     </div>
     <div class="inventory-items full-size">
         <mat-list class="full-size">
-            <mat-list-item *ngFor="let item of inventory.items">
+            <mat-list-item *ngFor="let item of inventory?.items">
                 <div class="inventory-item">
                     <mat-form-field>
                         <input matInput autocomplete="off" [(ngModel)]="item.name" name="name{{item.id}}" required>
