@@ -8,6 +8,7 @@ export class Player {
   constructor(
       public id: string,
       public userId: string,
+      public roomId: string,
       public name: string,
       public connected = true,
       public color?: string,
@@ -20,11 +21,11 @@ export class Player {
   }
 
   static newPlayer(player: Player): Player {
-    return new Player(player.id, player.userId, player.name, player.connected, player.color, player.avatar);
+    return new Player(player.id, player.userId, player.roomId, player.name, player.connected, player.color, player.avatar);
   }
 
-  static systemPlayer(): Player {
-    const player = new Player('0', '0', 'System');
+  static systemPlayer(roomId: string): Player {
+    const player = new Player('0', '0', roomId, 'System');
     player.system = true;
     return player;
   }

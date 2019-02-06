@@ -4,12 +4,9 @@ import com.hiper2d.BaseTest
 import com.hiper2d.model.Inventory
 import com.hiper2d.model.InventoryItem
 import com.hiper2d.model.Player
-import com.hiper2d.model.Room
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import org.springframework.http.MediaType
-import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 
@@ -17,8 +14,8 @@ internal class PlayerHandlerTest: BaseTest() {
 
     @Test
     fun shouldFindTwoCreatedPlayers() {
-        val p1 = Player(name = "P1", userId = "123")
-        val p2 = Player(name = "P2", userId = "456")
+        val p1 = Player(name = "P1", userId = "123", roomId = "123")
+        val p2 = Player(name = "P2", userId = "456", roomId = "123")
 
         val p1Str = mapper.writeValueAsString(p1)
         val p2Str = mapper.writeValueAsString(p2)
@@ -38,7 +35,7 @@ internal class PlayerHandlerTest: BaseTest() {
         val i2 = InventoryItem(name = "item2", description = "desc2")
         val inventory = Inventory(listOf(i1, i2))
 
-        val player = Player(name = "P1", userId = "123", inventory = inventory)
+        val player = Player(name = "P1", userId = "123", inventory = inventory, roomId = "123")
         val playerStr = mapper.writeValueAsString(player)
         val createdPlayer = createPlayer(playerStr)
 

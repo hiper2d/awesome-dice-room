@@ -13,7 +13,7 @@ import {PlayerService} from '../../core/service/player.service';
 import {BehaviorSubject} from 'rxjs';
 import {Queue} from '../../util/queue';
 import {RoomMessage} from '../../model/room-message';
-import {flatMap, map, mergeMap, tap} from 'rxjs/operators';
+import {flatMap, map, tap} from 'rxjs/operators';
 
 @Component({
   selector: 'room',
@@ -54,7 +54,6 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     ).subscribe(room => {
       if (!room) {
         this.leaveRoom();
-        return;
       } else {
         this.setupRoom(room);
       }
@@ -69,7 +68,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
         this.playersSbj.next(players);
       }))
       .subscribe(players => {
-        if (this.userService.isInRoom(room.id)) {
+        if (this.userService.isInRoom(room.id)) { // todo: we have create or find player backend method, so no need in this check
           this.takeYourExistingSeat(players, room);
         } else {
           this.setupNewSeat(room);
@@ -160,7 +159,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   }
 
   private setupNewSeat(room: Room) {
-    const newPlayer = new Player(null, this.userService.id, this.userService.name);
+    const newPlayer = new Player(null, this.userService.id, room.id, this.userService.name);
     this.playerService.createPlayer(newPlayer)
       .pipe(
         tap(player => {
@@ -187,7 +186,9 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     return this.players.find(p => p.id === id);
   }
 
-  private pushMessage(message: string, author: Player = Player.systemPlayer(), timestamp: string = new Date().toLocaleTimeString()) {
+  // todo: extract system player to global var to be inited only once
+  private pushMessage(message: string, author: Player = Player.systemPlayer(this.room.id),
+                      timestamp: string = new Date().toLocaleTimeString()) {
     this.chatMessages.push(new RoomMessage(message, author, timestamp));
   }
 }
