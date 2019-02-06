@@ -35,10 +35,10 @@ export class RoomService extends AbstractService {
   }
 
   addPlayerToRoom(roomId: string, playerId: string) {
-    return this.put<number>({ url: `${ApiConst.API_ROOMS}/${roomId}/playerId/${playerId}` });
+    return this.put<number>({ url: `${ApiConst.API_ROOMS}/${roomId}/player-id/${playerId}` });
   }
 
   removePlayerFromRoom(roomId: string, playerId: string) {
-    return this.delete<number>({ url: `${ApiConst.API_ROOMS}/${roomId}/playerId/${playerId}` });
+    return this.delete<number>({ url: `${ApiConst.API_ROOMS}/${roomId}/player-id/${playerId}` });
   }
 }

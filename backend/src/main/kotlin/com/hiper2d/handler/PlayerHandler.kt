@@ -24,6 +24,17 @@ class PlayerHandler(val playerRepository: PlayerRepository) {
         .contentType(MediaType.APPLICATION_JSON_UTF8)
         .body(req.bodyToMono<Player>().flatMap { playerRepository.insert(it) }, Player::class.java)
 
+    fun findOfCreate(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .body(findOrCreatePlayer(req), Player::class.java)
+
+    private fun findOrCreatePlayer(req: ServerRequest) =
+        req.bodyToMono<Player>().flatMap {
+            playerRepository
+                .findByRoomIdAndUserId(it.roomId, it.userId)
+                .switchIfEmpty(playerRepository.insert(it))
+        }
+
     private fun getPlayers(req: ServerRequest) =
         req.queryParam("ids")
             .map { it.split(",") }
