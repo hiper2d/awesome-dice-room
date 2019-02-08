@@ -1,6 +1,8 @@
 package com.hiper2d.handler
 
 import com.hiper2d.model.Room
+import com.hiper2d.model.dto.RoomDto
+import com.hiper2d.repository.PlayerRepository
 import com.hiper2d.repository.RoomRepository
 import com.mongodb.client.result.UpdateResult
 import org.springframework.http.MediaType
@@ -10,13 +12,14 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.bodyToMono
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
 
 @Component
-class RoomHandler(private val roomRepository: RoomRepository) {
+class RoomHandler(private val roomRepository: RoomRepository, private val playerRepository: PlayerRepository) {
 
     fun findRoom(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
         .contentType(MediaType.APPLICATION_JSON_UTF8)
-        .body(roomRepository.findById(req.pathVariable("id")), Room::class.java)
+        .body(getRoomWithPlayers(req), RoomDto::class.java)
 
     fun allRooms(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
         .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -47,4 +50,12 @@ class RoomHandler(private val roomRepository: RoomRepository) {
 
     private fun pullPlayerIdFromRoom(req: ServerRequest) =
         roomRepository.removePlayerIdFromRoom(req.pathVariable("id"), req.pathVariable("playerId"))
+
+    private fun getRoomWithPlayers(req: ServerRequest) =
+        roomRepository.findById(req.pathVariable("id"))
+            .flatMap { room ->
+                this.playerRepository.findAllByIdIn(room.playerIds)
+                    .collectList()
+                    .map { players -> RoomDto(room, players) }
+            }
 }
