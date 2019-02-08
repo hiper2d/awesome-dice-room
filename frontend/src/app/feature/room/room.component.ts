@@ -50,7 +50,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   ngOnInit() {
     this.route.paramMap.pipe(
       map(params => params.get('roomId')),
-      flatMap(roomId => this.roomService.getRoom(roomId))
+      flatMap(roomId => this.roomService.getRoom(roomId)) // fixme: this return Room with Players together, adjust other code here
     ).subscribe(room => {
       if (!room) {
         this.leaveRoom();
