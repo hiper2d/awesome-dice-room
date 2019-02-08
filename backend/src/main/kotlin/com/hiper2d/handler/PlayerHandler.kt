@@ -2,6 +2,7 @@ package com.hiper2d.handler
 
 import com.hiper2d.model.Player
 import com.hiper2d.repository.PlayerRepository
+import com.hiper2d.repository.RoomRepository
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -10,23 +11,22 @@ import org.springframework.web.reactive.function.server.bodyToMono
 import reactor.core.publisher.Mono
 
 @Component
-class PlayerHandler(val playerRepository: PlayerRepository) {
+class PlayerHandler(private val roomRepository: RoomRepository, private val playerRepository: PlayerRepository) {
 
     fun findPlayer(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
         .contentType(MediaType.APPLICATION_JSON_UTF8)
         .body(playerRepository.findById(req.pathVariable("id")), Player::class.java)
 
-    fun findPlayers(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
+    fun findOrCreate(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
         .contentType(MediaType.APPLICATION_JSON_UTF8)
-        .body(getPlayers(req), Player::class.java)
+        .body(createPlayerAndUpdateRoom(req), Player::class.java)
 
-    fun createPlayer(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
-        .body(req.bodyToMono<Player>().flatMap { playerRepository.insert(it) }, Player::class.java)
-
-    fun findOfCreate(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
-        .contentType(MediaType.APPLICATION_JSON_UTF8)
-        .body(findOrCreatePlayer(req), Player::class.java)
+    private fun createPlayerAndUpdateRoom(req: ServerRequest) =
+        findOrCreatePlayer(req).flatMap { player ->
+            player.id?.let {
+                this.roomRepository.addPlayerIdToRoom(roomId = player.roomId, playerId = player.id).map { player }
+            } ?: Mono.error { RuntimeException("Player cannot be added to room, God knows why") }
+        }
 
     private fun findOrCreatePlayer(req: ServerRequest) =
         req.bodyToMono<Player>().flatMap {

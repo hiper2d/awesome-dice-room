@@ -2,63 +2,50 @@ package com.hiper2d.handler
 
 import com.hiper2d.BaseTest
 import com.hiper2d.model.Room
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
-import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 
+@DisplayName("Given room exists")
 internal class RoomHandlerTest: BaseTest() {
 
-    lateinit var room: Room
-    lateinit var roomStr: String
+    private lateinit var room: Room
 
     @BeforeEach
     fun setup() {
-        room = Room(name = "Test Room")
-        roomStr = mapper.writeValueAsString(room)
+        room = generateRoom("Test Room", mapper, webClient)
     }
 
     @Test
-    fun shouldUpdateCreatedRoom() {
-        val originalRoom = createRoom(roomStr)
-        val newRoom = Room(id = originalRoom.id, name = "Updated")
+    fun `then should be able to update it`() {
+        val newRoom = Room(id = room.id, name = "Updated")
         val newRoomJson = mapper.writeValueAsString(newRoom)
         val updatedRoom = updateRoom(newRoomJson)
 
-        assertEquals(room.name, originalRoom?.name)
         assertEquals("Updated", updatedRoom?.name)
     }
 
     @Test
-    fun shouldFindCreatedRoom() {
-        val room = createRoom(roomStr)
-        assertEquals(room.name, room?.name)
+    fun `then should create new player and update room playerIds`() {
+        val player1 = generateOrFindPlayer("Alex 1", "123", room.id!!, mapper, webClient)
+        val player2 = generateOrFindPlayer("Alex 2", "456", room.id!!, mapper, webClient)
+        val updatedRoom = findRoom(room.id!!, webClient)
+
+        assertThat(updatedRoom.players, Matchers.containsInAnyOrder(player1, player2))
     }
 
-    private fun createRoom(json: String): Room {
-        return rest(
-            webClient.post().uri("/api/rooms")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromPublisher(Mono.just(json), String::class.java))
-        )
-    }
-
-    private fun updateRoom(json: String): Room {
-        return rest(
-            webClient.put().uri("/api/rooms")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromPublisher(Mono.just(json), String::class.java))
-        )
-    }
-
-    private fun rest(spec: WebTestClient.RequestHeadersSpec<*>): Room {
-        return spec
+    private fun updateRoom(json: String): Room =
+        webClient.put().uri("/api/rooms")
+            .contentType(MediaType.APPLICATION_JSON_UTF8)
+            .body(BodyInserters.fromPublisher(Mono.just(json), String::class.java))
             .exchange()
             .returnResult(Room::class.java)
             .responseBody
             .blockFirst()!!
-    }
 }

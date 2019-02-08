@@ -20,9 +20,6 @@ class GameRouter {
         GET("/api/rooms").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, roomHandler::allRooms)
         }
-        PUT("/api/rooms/{id}/player-id/{playerId}").nest {
-            accept(MediaType.APPLICATION_JSON_UTF8, roomHandler::addPlayerIdToRoom)
-        }
         DELETE("/api/rooms/{id}/player-id/{playerId}").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, roomHandler::removePlayerIdFromRoom)
         }
@@ -42,14 +39,8 @@ class GameRouter {
         GET("/api/players/{id}").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, playerHandler::findPlayer)
         }
-        GET("/api/players").nest {
-            accept(MediaType.APPLICATION_JSON_UTF8, playerHandler::findPlayers)
-        }
         POST("/api/players/find-or-create").nest {
-            accept(MediaType.APPLICATION_JSON_UTF8, playerHandler::findOfCreate)
-        }
-        POST("/api/players").nest {
-            accept(MediaType.APPLICATION_JSON_UTF8, playerHandler::createPlayer)
+            accept(MediaType.APPLICATION_JSON_UTF8, playerHandler::findOrCreate)
         }
     }
 }
