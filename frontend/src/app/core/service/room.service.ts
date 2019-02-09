@@ -4,6 +4,7 @@ import {AbstractService} from './abstract.service';
 import {Observable} from 'rxjs';
 import {Room} from '../../model/room';
 import {ApiConst} from '../../util/api.const';
+import {RoomFull} from '../../model/room-rull';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,8 @@ export class RoomService extends AbstractService {
     super(http);
   }
 
-  getRoom(id: string): Observable<Room> {
-    return this.get<Room>(`${ApiConst.API_ROOMS}/${id}`);
+  getRoom(id: string): Observable<RoomFull> {
+    return this.get<RoomFull>(`${ApiConst.API_ROOMS}/${id}`);
   }
 
   allRooms(): Observable<Array<Room>> {
