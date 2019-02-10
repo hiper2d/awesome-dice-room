@@ -25,9 +25,10 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   @ViewChild('chatbox') chatbox: ElementRef;
   chatMessages: Queue<RoomMessage> = new Queue(100);
   message = '';
-  room: RoomFull;
-  you: Player;
+  currentPlayer: Player;
+  systemPlayer: Player;
 
+  private room: RoomFull;
   private playersSbj = new BehaviorSubject<Array<Player>>([]);
   playersObj = this.playersSbj.asObservable();
 
@@ -53,12 +54,13 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
       tap(room => this.throwIfEmpty(room)),
       tap(room => {
         room.players.map(p => Player.addColorIfMissing(p));
+        this.systemPlayer = Player.systemPlayer(room.id);
         this.room = room;
       }),
       flatMap(room => this.playerService.findOrCreatePlayer(new Player(null, this.userService.id, room.id, this.userService.name))),
       tap(player => {
-        this.you = Player.newPlayer(player);
-        this.addPlayerTab(this.you);
+        this.currentPlayer = Player.newPlayer(player);
+        this.addPlayerTab(this.currentPlayer);
       })
     ).subscribe(
       () => {
@@ -83,10 +85,10 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
 
   leaveRoom() {
     if (this.wsConnection) {
-      this.wsConnection.close(); // fixme: too slow, doesn't work
+      this.onWsClose(); // hmm, looks like a hack
     }
-    if (this.room && this.you) {
-      this.roomService.removePlayerFromRoom(this.room.id, this.you.id).subscribe();
+    if (this.room && this.currentPlayer) {
+      this.roomService.removePlayerFromRoom(this.room.id, this.currentPlayer.id).subscribe(); // not sure about this, may not work stable
     }
     this.router.navigate(['/']);
   }
@@ -134,7 +136,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
         this.pushMessageToChat(`${this.getPlayerByUser(message.senderId).name}'s items :<br/>${items}`);
 
         if (!this.isMyOwnMessage(message)) {
-          this.room.players.find(p => p.userId === this.you.userId).inventory = message.data;
+          this.room.players.find(p => p.userId === this.currentPlayer.userId).inventory = message.data;
         }
         break;
     }
@@ -143,10 +145,10 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   }
 
   private isMyOwnMessage(message) {
-    return message.senderId === this.you.id;
+    return message.senderId === this.currentPlayer.id;
   }
 
-  private notifyAll = (params: WsMessageParam) => this.sendWsMessage({ roomId: this.room.id, senderId: this.you.id, ...params });
+  private notifyAll = (params: WsMessageParam) => this.sendWsMessage({ roomId: this.room.id, senderId: this.currentPlayer.id, ...params });
 
   private addPlayerTab(player: Player) {
     if (this.room.players.indexOf(player) === -1) {
@@ -159,9 +161,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     return this.room.players.find(p => p.id === id);
   }
 
-  // todo: extract system player to global var to be inited only once
-  private pushMessageToChat(message: string, author: Player = Player.systemPlayer(this.room.id),
-                      timestamp: string = new Date().toLocaleTimeString()) {
+  private pushMessageToChat(message: string, author: Player = this.systemPlayer, timestamp: string = new Date().toLocaleTimeString()) {
     this.chatMessages.push(new RoomMessage(message, author, timestamp));
   }
 
