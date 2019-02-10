@@ -91,6 +91,6 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   }
 
   private notifyOthers(rooId: string, messageType: WsDashboardMessageType) {
-    this.send({type: messageType, data: rooId});
+    this.sendWsMessage({type: messageType, data: rooId});
   }
 }

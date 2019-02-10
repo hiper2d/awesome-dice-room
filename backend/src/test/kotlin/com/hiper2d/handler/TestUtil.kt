@@ -31,7 +31,7 @@ fun findRoom(id: String, webClient: WebTestClient): RoomFull {
 }
 
 fun generateOrFindPlayer(name: String, userId: String, roomId: String, mapper: ObjectMapper, webClient: WebTestClient): Player {
-    val player = Player(name = name, userId = userId, roomId = roomId)
+    val player = Player(name = name, userId = userId, roomId = roomId, avatar = "somepic")
     val playerJson = mapper.writeValueAsString(player)
 
     return webClient.post().uri("/api/players/find-or-create")

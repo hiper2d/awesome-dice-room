@@ -51,45 +51,53 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
       map(params => params.get('roomId')),
       flatMap(roomId => this.roomService.getRoom(roomId)),
       tap(room => this.throwIfEmpty(room)),
-      tap(room => this.room = room),
+      tap(room => {
+        room.players.map(p => Player.addColorIfMissing(p));
+        this.room = room;
+      }),
       flatMap(room => this.playerService.findOrCreatePlayer(new Player(null, this.userService.id, room.id, this.userService.name))),
       tap(player => {
-        this.you = player;
-        this.addPlayerTab(player);
+        this.you = Player.newPlayer(player);
+        this.addPlayerTab(this.you);
       })
     ).subscribe(
-      () => this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`),
+      () => {
+        this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
+      },
       () => this.leaveRoom()
     );
   }
 
-  private throwIfEmpty(room) {
-    if (room == null) {
-      throw new Error('Room cannot be found');
-    }
-  }
-
   ngOnDestroy() {
-    if (this.wsConnection) {
-      this.disconnect();
-    }
+    this.leaveRoom();
   }
 
   onSendMessage() {
     if (this.message) {
-      this.sendMessage({ type: WsRoomMessageType.CHAT_MESSAGE, data: this.message });
+      this.notifyAll({ type: WsRoomMessageType.CHAT_MESSAGE, data: this.message });
       this.message = '';
     }
   }
 
-  onInventorySave = (inventory: Inventory) => this.sendMessage({ type: WsRoomMessageType.INVENTORY, data: inventory });
+  onInventorySave = (inventory: Inventory) => this.notifyAll({ type: WsRoomMessageType.INVENTORY, data: inventory });
 
   leaveRoom() {
     if (this.wsConnection) {
-      this.onClose();
+      this.wsConnection.close(); // fixme: too slow, doesn't work
     }
-
+    if (this.room && this.you) {
+      this.roomService.removePlayerFromRoom(this.room.id, this.you.id).subscribe();
+    }
     this.router.navigate(['/']);
+  }
+
+  protected onWsOpen() {
+    this.notifyAll({ type: WsRoomMessageType.HI_I_AM_NEW_HERE });
+    this.pushMessageToChat('Connected');
+  }
+
+  protected onWsClose() {
+    this.notifyAll({ type: WsRoomMessageType.DISCONNECT });
   }
 
   protected onMessage(result) {
@@ -97,32 +105,33 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
 
     switch (message.type) {
       case WsRoomMessageType.ROLL:
-        this.pushMessage(`${this.getPlayerById(message.senderId).name}'s Roll result is ${message.data}`);
+        const text = message.data as string;
+        this.pushMessageToChat(`${this.getPlayerByUser(message.senderId).name}'s Roll result is ${text}`);
         break;
 
       case WsRoomMessageType.HI_I_AM_NEW_HERE:
         if (!this.isMyOwnMessage(message)) {
-          const joinedPlayerId = message.data;
+          const joinedPlayerId = message.senderId;
           this.playerService.getPlayer(joinedPlayerId).subscribe(p => {
               this.addPlayerTab(Player.newPlayer(p));
-              this.pushMessage(`${message.data.name} joined room`);
+              this.pushMessageToChat(`${p.name} joined room`);
             });
         }
         break;
 
       case WsRoomMessageType.CHAT_MESSAGE:
-        this.pushMessage(message.data, this.getPlayerById(message.senderId));
+        const sender = this.getPlayerByUser(message.senderId);
+        this.pushMessageToChat(message.data, sender);
         break;
 
       case WsRoomMessageType.DISCONNECT:
-        this.pushMessage(`${this.getPlayerById(message.senderId).name} disconnected`);
-        this.roomService.removePlayerFromRoom(this.room.id, this.you.id);
+        this.pushMessageToChat(`${this.getPlayerByUser(message.senderId).name} disconnected`);
         break;
 
       case WsRoomMessageType.INVENTORY:
         const inventory: Inventory = message.data;
         const items = inventory.items.reduce((acc, i) => `${acc}<br/> name: ${i.name} description: ${i.description}`, '');
-        this.pushMessage(`${this.getPlayerById(message.senderId).name}'s items :<br/>${items}`);
+        this.pushMessageToChat(`${this.getPlayerByUser(message.senderId).name}'s items :<br/>${items}`);
 
         if (!this.isMyOwnMessage(message)) {
           this.room.players.find(p => p.userId === this.you.userId).inventory = message.data;
@@ -133,33 +142,32 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     setTimeout(() => this.chatbox.nativeElement.scrollTop = this.chatbox.nativeElement.scrollHeight);
   }
 
-  protected onOpen() {
-    this.sendMessage({ type: WsRoomMessageType.HI_I_AM_NEW_HERE, data: this.you.id });
-    this.pushMessage('Connected');
-  }
-
-  protected onClose() {
-    this.sendMessage({ type: WsRoomMessageType.DISCONNECT });
-  }
-
   private isMyOwnMessage(message) {
-    return message.senderId === this.userService.id;
+    return message.senderId === this.you.id;
   }
 
-  private sendMessage = (params: WsMessageParam) => this.send({ roomId: this.room.id, ...params });
+  private notifyAll = (params: WsMessageParam) => this.sendWsMessage({ roomId: this.room.id, senderId: this.you.id, ...params });
 
   private addPlayerTab(player: Player) {
-    this.room.players.push(player);
-    this.playersSbj.next(this.room.players);
+    if (this.room.players.indexOf(player) === -1) {
+      this.room.players.push(player);
+      this.playersSbj.next(this.room.players);
+    }
   }
 
-  private getPlayerById(id: string) {
+  private getPlayerByUser(id: string) {
     return this.room.players.find(p => p.id === id);
   }
 
   // todo: extract system player to global var to be inited only once
-  private pushMessage(message: string, author: Player = Player.systemPlayer(this.room.id),
+  private pushMessageToChat(message: string, author: Player = Player.systemPlayer(this.room.id),
                       timestamp: string = new Date().toLocaleTimeString()) {
     this.chatMessages.push(new RoomMessage(message, author, timestamp));
+  }
+
+  private throwIfEmpty(room) {
+    if (room == null) {
+      throw new Error('Room cannot be found');
+    }
   }
 }

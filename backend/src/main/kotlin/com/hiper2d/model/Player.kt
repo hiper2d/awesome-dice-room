@@ -9,5 +9,6 @@ data class Player(
     val userId: String,
     val roomId: String,
     val name: String,
+    val avatar: String,
     val inventory: Inventory? = null
 )

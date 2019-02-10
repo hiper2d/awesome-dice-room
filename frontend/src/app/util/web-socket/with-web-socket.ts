@@ -10,17 +10,17 @@ export abstract class WithWebSocket {
   protected connect(topic: string) {
     this.wsConnection = new WebSocket(`${ApiConst.WS_HOST}/${topic}`);
     this.wsConnection.onmessage = (result) => this.onMessage(result);
-    this.wsConnection.onopen = () => this.onOpen();
-    this.wsConnection.onclose = () => this.onClose();
+    this.wsConnection.onopen = () => this.onWsOpen();
+    this.wsConnection.onclose = () => this.onWsClose();
   }
 
-  protected send(params: WsMessageParam) {
-    this.wsConnection.send(JSON.stringify(new WsMessage({ senderId: this.userService.id, ...params })));
+  protected sendWsMessage(params: WsMessageParam) {
+    this.wsConnection.send(JSON.stringify(new WsMessage(params)));
   }
 
   protected disconnect = () => this.wsConnection.close();
 
   protected abstract onMessage(result);
-  protected onOpen() {}
-  protected onClose() {}
+  protected onWsOpen() {}
+  protected onWsClose() {}
 }
