@@ -22,7 +22,7 @@
   <mat-tab-group color="accent">
     <mat-tab *ngFor="let player of playersObj | async" [label]="player.name">
         <ng-template mat-tab-label>
-            <mat-icon *ngIf="player.connected" class="mat-accent">done</mat-icon>
+            <mat-icon class="mat-accent">done</mat-icon>
             <span class="tab-header-text">{{ player.name }}</span>
         </ng-template>
         <div class="tab-body">

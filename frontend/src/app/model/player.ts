@@ -3,16 +3,15 @@ import {Avatar} from '../util/avatar';
 import {Color} from '../util/color';
 
 export class Player {
-  private system = false;
+  private _system = false;
 
   constructor(
       public id: string,
       public userId: string,
       public roomId: string,
       public name: string,
-      public connected = true,
+      public avatar?: string,
       public color?: string,
-      private avatar?: string,
       public inventory?: Inventory
   ) {
     this.color = color || Color.getColor();
@@ -21,16 +20,22 @@ export class Player {
   }
 
   static newPlayer(player: Player): Player {
-    return new Player(player.id, player.userId, player.roomId, player.name, player.connected, player.color, player.avatar);
+    return new Player(player.id, player.userId, player.roomId, player.name, player.avatar);
   }
 
   static systemPlayer(roomId: string): Player {
     const player = new Player('0', '0', roomId, 'System');
-    player.system = true;
+    player._system = true;
     return player;
   }
 
-  isSystem(): boolean {
-    return this.system;
+  static addColorIfMissing(player: Player): void {
+    if (!player.color) {
+      player.color = Color.getColor();
+    }
+  }
+
+  get system(): boolean {
+    return this._system;
   }
 }

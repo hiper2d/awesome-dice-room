@@ -19,14 +19,14 @@ export class RoomMessageComponent implements OnInit {
 
     getAuthorClass() {
         return {
-            system: this.message.author.isSystem(),
-            [this.message.author.color]: !this.message.author.isSystem()
+            system: this.message.author.system,
+            [this.message.author.color]: !this.message.author.system
         };
     }
 
     getMessageClass() {
         return {
-            system: this.message.author.isSystem()
+            system: this.message.author.system
         };
     }
 }
