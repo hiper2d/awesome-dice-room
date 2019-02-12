@@ -3,24 +3,25 @@ import {AbstractService} from './abstract.service';
 import {Player} from '../../model/player';
 import {ApiConst} from '../../util/api.const';
 import {Observable} from 'rxjs';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayerService extends AbstractService {
 
+  private _systemPlayer = Player.systemPlayer();
+
   constructor(http: HttpClient) {
     super(http);
   }
 
-  getPlayer(id: string): Observable<Player> {
-    return this.get<Player>(`${ApiConst.API_PLAYERS}/${id}`);
+  get systemPlayer(): Player {
+    return this._systemPlayer;
   }
 
-  getPlayers(ids: Array<string>): Observable<Array<Player>> {
-    const params = new HttpParams().set('ids', ids.join(','));
-    return this.get<Array<Player>>(`${ApiConst.API_PLAYERS}`, params);
+  getPlayer(id: string): Observable<Player> {
+    return this.get<Player>(`${ApiConst.API_PLAYERS}/${id}`);
   }
 
   findOrCreatePlayer(player: Player): Observable<Player> {

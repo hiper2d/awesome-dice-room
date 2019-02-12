@@ -23,8 +23,8 @@ export class Player {
     return new Player(player.id, player.userId, player.roomId, player.name, player.avatar);
   }
 
-  static systemPlayer(roomId: string): Player {
-    const player = new Player('0', '0', roomId, 'System');
+  static systemPlayer(): Player {
+    const player = new Player('0', '0', '0', 'System');
     player._system = true;
     return player;
   }

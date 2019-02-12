@@ -47,6 +47,6 @@ class RoomHandler(private val roomRepository: RoomRepository, private val player
             .flatMap { room ->
                 this.playerRepository.findAllByIdIn(room.playerIds)
                     .collectList()
-                    .map { players -> RoomFull(room, players) }
+                    .map { players -> RoomFull(room.id, room.name, players) }
             }
 }

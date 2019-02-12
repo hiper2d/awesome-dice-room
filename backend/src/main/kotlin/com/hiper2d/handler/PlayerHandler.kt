@@ -34,10 +34,4 @@ class PlayerHandler(private val roomRepository: RoomRepository, private val play
                 .findByRoomIdAndUserId(it.roomId, it.userId)
                 .switchIfEmpty(playerRepository.insert(it))
         }
-
-    private fun getPlayers(req: ServerRequest) =
-        req.queryParam("ids")
-            .map { it.split(",") }
-            .map { ids -> playerRepository.findAllByIdIn(ids) }
-            .orElse(null)
 }
