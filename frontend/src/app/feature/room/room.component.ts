@@ -12,8 +12,9 @@ import {PlayerService} from '../../core/service/player.service';
 import {BehaviorSubject} from 'rxjs';
 import {Queue} from '../../util/queue';
 import {RoomMessage} from '../../model/room-message';
-import {flatMap, map, tap} from 'rxjs/operators';
+import {flatMap, map, tap, throwIfEmpty} from 'rxjs/operators';
 import {RoomFull} from '../../model/room-rull';
+import {ExceptionUtil} from '../../util/exception.util';
 
 @Component({
   selector: 'room',
@@ -26,7 +27,6 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   chatMessages: Queue<RoomMessage> = new Queue(100);
   message = '';
   currentPlayer: Player;
-  systemPlayer: Player;
 
   private room: RoomFull;
   private playersSbj = new BehaviorSubject<Array<Player>>([]);
@@ -51,10 +51,9 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     this.route.paramMap.pipe(
       map(params => params.get('roomId')),
       flatMap(roomId => this.roomService.getRoom(roomId)),
-      tap(room => this.throwIfEmpty(room)),
+      tap(room => ExceptionUtil.throwIfEmpty(room, 'Room cannot be found')),
       tap(room => {
-        room.players.map(p => Player.addColorIfMissing(p));
-        this.systemPlayer = Player.systemPlayer(room.id);
+        room.players.forEach(p => Player.addColorIfMissing(p));
         this.room = room;
       }),
       flatMap(room => this.playerService.findOrCreatePlayer(new Player(null, this.userService.id, room.id, this.userService.name))),
@@ -85,7 +84,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
 
   leaveRoom() {
     if (this.wsConnection) {
-      this.onWsClose(); // hmm, looks like a hack
+      this.onWsClose();
     }
     if (this.room && this.currentPlayer) {
       this.roomService.removePlayerFromRoom(this.room.id, this.currentPlayer.id).subscribe(); // not sure about this, may not work stable
@@ -107,8 +106,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
 
     switch (message.type) {
       case WsRoomMessageType.ROLL:
-        const text = message.data as string;
-        this.pushMessageToChat(`${this.getPlayerByUser(message.senderId).name}'s Roll result is ${text}`);
+        this.pushMessageToChat(`${this.getPlayerByUser(message.senderId).name}'s Roll result is ${message.data}`);
         break;
 
       case WsRoomMessageType.HI_I_AM_NEW_HERE:
@@ -122,8 +120,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
         break;
 
       case WsRoomMessageType.CHAT_MESSAGE:
-        const sender = this.getPlayerByUser(message.senderId);
-        this.pushMessageToChat(message.data, sender);
+        this.pushMessageToChat(message.data, this.getPlayerByUser(message.senderId));
         break;
 
       case WsRoomMessageType.DISCONNECT:
@@ -144,7 +141,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     setTimeout(() => this.chatbox.nativeElement.scrollTop = this.chatbox.nativeElement.scrollHeight);
   }
 
-  private isMyOwnMessage(message) {
+  private isMyOwnMessage(message): boolean {
     return message.senderId === this.currentPlayer.id;
   }
 
@@ -161,13 +158,11 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
     return this.room.players.find(p => p.id === id);
   }
 
-  private pushMessageToChat(message: string, author: Player = this.systemPlayer, timestamp: string = new Date().toLocaleTimeString()) {
+  private pushMessageToChat(
+    message: string,
+    author: Player = this.playerService.systemPlayer,
+    timestamp: string = new Date().toLocaleTimeString()
+  ) {
     this.chatMessages.push(new RoomMessage(message, author, timestamp));
-  }
-
-  private throwIfEmpty(room) {
-    if (room == null) {
-      throw new Error('Room cannot be found');
-    }
   }
 }

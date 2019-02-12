@@ -59,7 +59,7 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   removeRoom(id: string) {
     this.roomService.deleteRoom(id)
       .pipe(tap(() => {
-        this.rooms.splice(this.rooms.map(r => r.id).indexOf(id), 1);
+        this.rooms.splice(this.rooms.findIndex(r => r.id === id), 1);
         this.roomsSbj.next(this.rooms);
       }))
       .subscribe(() => this.notifyOthers(id, WsDashboardMessageType.REMOVE_ROOM));
@@ -90,7 +90,7 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
     }
   }
 
-  private notifyOthers(rooId: string, messageType: WsDashboardMessageType) {
-    this.sendWsMessage({type: messageType, data: rooId});
+  private notifyOthers(roomId: string, messageType: WsDashboardMessageType) {
+    this.sendWsMessage({type: messageType, data: roomId});
   }
 }
