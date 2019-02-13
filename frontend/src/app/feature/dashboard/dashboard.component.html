@@ -7,7 +7,7 @@
     <mat-list>
         <mat-list-item *ngFor="let room of roomsObs | async">
             <div class="dashboard-room full-size">
-                <div class="dashboard-room-name">Room {{room.id}}</div>
+                <div class="dashboard-room-name">{{room.name}}</div>
                 <button mat-icon-button (click)="openRoom(room.id)" color="accent">
                     <mat-icon>forward</mat-icon>
                 </button>

@@ -14,10 +14,7 @@ export abstract class WithWebSocket {
     this.wsConnection.onclose = () => this.onWsClose();
   }
 
-  protected sendWsMessage(params: WsMessageParam) {
-    this.wsConnection.send(JSON.stringify(new WsMessage(params)));
-  }
-
+  protected sendWsMessage = (params: WsMessageParam) => this.wsConnection.send(JSON.stringify(new WsMessage(params)));
   protected disconnect = () => this.wsConnection.close();
 
   protected abstract onMessage(result);

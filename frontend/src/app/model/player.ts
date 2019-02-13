@@ -19,20 +19,17 @@ export class Player {
     this.inventory = inventory || new Inventory();
   }
 
-  static newPlayer(player: Player): Player {
-    return new Player(player.id, player.userId, player.roomId, player.name, player.avatar);
-  }
-
   static systemPlayer(): Player {
-    const player = new Player('0', '0', '0', 'System');
+    const player = new Player(
+        '0',
+        '0',
+        '0',
+        'System',
+        'assets/avatars/admin.png',
+        'red'
+    );
     player._system = true;
     return player;
-  }
-
-  static addColorIfMissing(player: Player): void {
-    if (!player.color) {
-      player.color = Color.getColor();
-    }
   }
 
   get system(): boolean {

@@ -1,7 +1,6 @@
 import {Component} from '@angular/core';
 import {MatDialogRef} from '@angular/material';
 import {Room} from '../../../model/room';
-import {Generator} from '../../../util/generator';
 
 @Component({
   selector: 'dashboard-dialog',
@@ -16,6 +15,6 @@ export class DashboardDialogComponent {
     private dialogRef: MatDialogRef<DashboardDialogComponent>
   ) {}
 
-  onAccept = () => this.dialogRef.close(new Room(Generator.uuid(), this.name, this.description));
+  onAccept = () => this.dialogRef.close(new Room(null, this.name, this.description));
   onNoClick = () => this.dialogRef.close();
 }
