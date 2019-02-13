@@ -2,8 +2,7 @@ package com.hiper2d.util
 
 data class WsMessage(
     val type: String,
-    val data: Any?,
-    val senderId: String
+    val data: Any?
 )
 
 data class WsRoomMessage(

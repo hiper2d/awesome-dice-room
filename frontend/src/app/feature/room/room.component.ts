@@ -52,19 +52,14 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
       map(params => params.get('roomId')),
       flatMap(roomId => this.roomService.getRoom(roomId)),
       tap(room => ExceptionUtil.throwIfEmpty(room, 'Room cannot be found')),
-      tap(room => {
-        room.players.forEach(p => Player.addColorIfMissing(p));
-        this.room = room;
-      }),
+      tap(room => this.room = room),
       flatMap(room => this.playerService.findOrCreatePlayer(new Player(null, this.userService.id, room.id, this.userService.name))),
       tap(player => {
-        this.currentPlayer = Player.newPlayer(player);
+        this.currentPlayer = player;
         this.addPlayerTab(this.currentPlayer);
       })
     ).subscribe(
-      () => {
-        this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`);
-      },
+      () => this.connect(`${ApiConst.WS_ROOM}/${this.room.id}`),
       () => this.leaveRoom()
     );
   }
@@ -112,7 +107,7 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
       case WsRoomMessageType.HI_I_AM_NEW_HERE:
         if (!this.isMyOwnMessage(message)) {
           this.playerService.getPlayer(message.senderId).subscribe(p => {
-              this.addPlayerTab(Player.newPlayer(p));
+              this.addPlayerTab(p);
               this.pushMessageToChat(`${p.name} joined room`);
             });
         }
