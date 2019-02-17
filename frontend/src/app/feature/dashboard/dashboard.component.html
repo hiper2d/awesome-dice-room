@@ -1,8 +1,16 @@
 <div class="dashboard full-size">
     <div class="dashboard-buttons">
-        <button mat-icon-button (click)="addRoom()" color="accent">
-            <mat-icon>add_circle</mat-icon>
+        <button mat-fab (click)="addRoom()" color="accent">
+            <mat-icon aria-label="Add room">add</mat-icon>
         </button>
+        <span>
+            <button mat-fab (click)="login()" color="accent">
+                <mat-icon aria-label="Login">exit_to_app</mat-icon>
+            </button>
+            <button mat-fab (click)="signup()" color="accent">
+                <mat-icon aria-label="Login">person_add</mat-icon>
+            </button>
+        </span>
     </div>
     <mat-list>
         <mat-list-item *ngFor="let room of roomsObs | async">

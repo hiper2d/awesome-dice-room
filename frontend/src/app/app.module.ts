@@ -5,7 +5,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {RoomModule} from './feature/room/room.module';
 import {DashboardModule} from './feature/dashboard/dashboard.module';
 import {CoreModule} from './core/core.module';
-import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
+import {PageNotFoundComponent} from './feature/page-not-found/page-not-found.component';
 import {BrowserModule} from '@angular/platform-browser';
 
 @NgModule({
