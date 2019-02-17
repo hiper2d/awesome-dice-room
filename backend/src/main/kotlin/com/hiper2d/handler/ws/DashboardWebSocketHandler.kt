@@ -1,4 +1,4 @@
-package com.hiper2d.handler
+package com.hiper2d.handler.ws
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.hiper2d.util.WsMessage
@@ -7,7 +7,7 @@ import org.springframework.web.reactive.socket.WebSocketSession
 import reactor.core.publisher.Mono
 
 @Component
-class DashboardWebSocketHandler: WsHandler<WsMessage>() {
+class DashboardWebSocketHandler: AbstractWebSocketHandler<WsMessage>() {
 
     override fun handle(session: WebSocketSession): Mono<Void> {
         val input = session.receive()

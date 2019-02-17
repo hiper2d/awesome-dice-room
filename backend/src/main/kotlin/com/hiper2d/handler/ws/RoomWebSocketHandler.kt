@@ -1,4 +1,4 @@
-package com.hiper2d.handler
+package com.hiper2d.handler.ws
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.hiper2d.util.DiceRoller
@@ -9,7 +9,7 @@ import org.springframework.web.reactive.socket.WebSocketSession
 import reactor.core.publisher.Mono
 
 @Component
-class RoomWebSocketHandler: WsHandler<WsRoomMessage>() {
+class RoomWebSocketHandler: AbstractWebSocketHandler<WsRoomMessage>() {
     private val diceRoller = DiceRoller()
 
     override fun handle(session: WebSocketSession): Mono<Void> {
