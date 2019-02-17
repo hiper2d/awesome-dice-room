@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 
 fun generateRoom(name: String, mapper: ObjectMapper, webClient: WebTestClient): Room {
-    val room = Room(name = name)
+    val room = Room(id = null, name = name, description = "")
     val roomJson = mapper.writeValueAsString(room)
 
     return webClient.post().uri("/api/rooms")
@@ -31,7 +31,7 @@ fun findRoom(id: String, webClient: WebTestClient): RoomFull {
 }
 
 fun generateOrFindPlayer(name: String, userId: String, roomId: String, mapper: ObjectMapper, webClient: WebTestClient): Player {
-    val player = Player(name = name, userId = userId, roomId = roomId, avatar = "somepic")
+    val player = Player(id = null, name = name, userId = userId, roomId = roomId, avatar = "somepic", color = "test", inventory = null)
     val playerJson = mapper.writeValueAsString(player)
 
     return webClient.post().uri("/api/players/find-or-create")
