@@ -1,7 +1,7 @@
 package com.hiper2d.config
 
-import com.hiper2d.handler.DashboardWebSocketHandler
-import com.hiper2d.handler.RoomWebSocketHandler
+import com.hiper2d.handler.ws.DashboardWebSocketHandler
+import com.hiper2d.handler.ws.RoomWebSocketHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.cors.CorsConfiguration

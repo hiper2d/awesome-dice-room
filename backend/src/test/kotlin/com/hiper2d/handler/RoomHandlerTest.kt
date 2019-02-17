@@ -24,7 +24,7 @@ internal class RoomHandlerTest: BaseTest() {
 
     @Test
     fun `then should be able to update it`() {
-        val newRoom = Room(id = room.id, name = "Updated")
+        val newRoom = Room(id = room.id, name = "Updated", description = "")
         val newRoomJson = mapper.writeValueAsString(newRoom)
         val updatedRoom = updateRoom(newRoomJson)
 

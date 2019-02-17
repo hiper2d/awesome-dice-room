@@ -1,5 +1,6 @@
 package com.hiper2d.router
 
+import com.hiper2d.handler.AuthHandler
 import com.hiper2d.handler.PlayerHandler
 import com.hiper2d.handler.RoomHandler
 import org.springframework.context.annotation.Bean
@@ -11,6 +12,16 @@ import org.springframework.web.reactive.function.server.router
 
 @Configuration
 class GameRouter {
+
+    @Bean
+    fun loginRoute(authHandler: AuthHandler): RouterFunction<ServerResponse> = router {
+        POST("/api/token").nest {
+            accept(MediaType.APPLICATION_JSON_UTF8, authHandler::authenticate)
+        }
+        POST("/api/reg").nest {
+            accept(MediaType.APPLICATION_JSON_UTF8, authHandler::authenticate)
+        }
+    }
 
     @Bean
     fun roomRoute(roomHandler: RoomHandler): RouterFunction<ServerResponse> = router {

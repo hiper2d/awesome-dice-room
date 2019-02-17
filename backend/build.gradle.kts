@@ -17,6 +17,7 @@ val disruptorVersion: String by project
 val jaxbVersion: String by project
 val kotlinJacksonVersion: String by project
 val junitJupiterVersion: String by project
+val jjwtVersion: String = "0.9.+"
 
 repositories {
     jcenter()
@@ -25,9 +26,12 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
+    implementation("io.jsonwebtoken:jjwt:$jjwtVersion")
+
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("com.lmax:disruptor:$disruptorVersion") // Log4j2 async appender
 

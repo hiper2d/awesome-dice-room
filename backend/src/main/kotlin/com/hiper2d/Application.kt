@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 
 
 @SpringBootApplication
-@EnableReactiveMongoRepositories
+@EnableReactiveMongoRepositories(basePackages = ["com.hiper2d.repository"] )
 class Application
 
 fun main(args: Array<String>) {
