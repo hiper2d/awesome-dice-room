@@ -7,10 +7,10 @@ import {WsDashboardMessageType} from '../../util/web-socket/ws-message-type';
 import {UserService} from '../../core/service/user.service';
 import {Room} from '../../model/room';
 import {BehaviorSubject} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {filter, flatMap, tap} from 'rxjs/operators';
 import {ApiConst} from '../../util/api.const';
 import {MatDialog} from '@angular/material';
-import {DashboardDialogComponent} from './dashboard-dialog/dashboard-dialog.component';
+import {CreateRoomDialogComponent} from './create-room-dialog/create-room-dialog.component';
 
 @Component({
   selector: 'dashboard',
@@ -47,16 +47,16 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   }
 
   addRoom() {
-      this.dialog.open(DashboardDialogComponent).afterClosed().subscribe((room: Room) => {
-        this.roomService.createRoom(room)
-            .pipe(
-                tap(createdRoom => {
-                  this.rooms.unshift(createdRoom);
-                  this.roomsSbj.next(this.rooms);
-                })
-            )
-            .subscribe(createdRoom => this.notifyOthers(createdRoom.id, WsDashboardMessageType.NEW_ROOM));
-      });
+    this.dialog.open(CreateRoomDialogComponent).afterClosed()
+      .pipe(
+        filter(obj => obj != null),
+        flatMap((room: Room) => this.roomService.createRoom(room)),
+        tap(createdRoom => {
+          this.rooms.unshift(createdRoom);
+          this.roomsSbj.next(this.rooms);
+        })
+      )
+      .subscribe(createdRoom => this.notifyOthers(createdRoom.id, WsDashboardMessageType.NEW_ROOM));
   }
 
   removeRoom(id: string) {

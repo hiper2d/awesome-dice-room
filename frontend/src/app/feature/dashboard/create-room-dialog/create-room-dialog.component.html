@@ -1,0 +1,14 @@
+<form [formGroup]="roomCreateForm">
+  <mat-form-field class="full-width">
+    <input matInput placeholder="Room name" autocomplete="off" formControlName="name" required autofocus>
+  </mat-form-field>
+
+  <mat-form-field class="full-width">
+    <textarea matInput placeholder="Room description" formControlName="description" required></textarea>
+  </mat-form-field>
+
+  <div mat-dialog-actions>
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-button (click)="onAccept()" [disabled]="!roomCreateForm.valid">Create Room</button>
+  </div>
+</form>

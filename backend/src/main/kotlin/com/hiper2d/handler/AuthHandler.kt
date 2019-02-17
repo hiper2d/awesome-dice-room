@@ -24,13 +24,16 @@ class AuthHandler @Autowired constructor(
 ) {
 
     fun register(request: ServerRequest): Mono<ServerResponse> {
-        val user = request.bodyToMono(JwtAuthenticationRequest::class.java)
+        return request.bodyToMono(JwtAuthenticationRequest::class.java)
             .flatMap { createUser(it) }
-            .map { JwtAuthenticationResponse(it.username, generateJwtToken(it)) }
-
-        return ServerResponse.ok()
-            .contentType(MediaType.APPLICATION_JSON_UTF8)
-            .body(user, JwtAuthenticationResponse::class.java)
+            .flatMap {
+                ServerResponse.ok()
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .build()
+            }
+            .onErrorResume {
+                ServerResponse.status(500).build()
+            }
     }
 
     fun authenticate(request: ServerRequest): Mono<ServerResponse> {
@@ -44,7 +47,7 @@ class AuthHandler @Autowired constructor(
     }
 
     private fun createUser(token: JwtAuthenticationRequest): Mono<User> =
-        Mono.just(User(null, token.username, token.password, emptyList()))
+        Mono.just(User(name = token.username, password = encoder.encode(token.password), roles = emptyList()))
             .flatMap { userRepository.save(it) }
 
     private fun findUser(token: JwtAuthenticationRequest): Mono<User> =
