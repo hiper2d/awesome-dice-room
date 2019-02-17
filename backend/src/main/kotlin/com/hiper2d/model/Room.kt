@@ -7,6 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class Room(
     @Id val id: String?,
     val name: String,
-    val description: String?,
+    val description: String,
     val playerIds: List<String> = emptyList()
 )

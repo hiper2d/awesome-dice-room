@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails
 @Document(collection = "user")
 class User @JsonCreator(mode=JsonCreator.Mode.PROPERTIES) constructor(
     @Id val id: String? = null,
-    private val username: String,
+    private val name: String,
     private val password: String,
     private val roles: List<String>
 ): UserDetails {
@@ -20,7 +20,7 @@ class User @JsonCreator(mode=JsonCreator.Mode.PROPERTIES) constructor(
 
     override fun isEnabled() = true
 
-    override fun getUsername() = username
+    override fun getUsername() = name
 
     override fun isCredentialsNonExpired() = true
 
