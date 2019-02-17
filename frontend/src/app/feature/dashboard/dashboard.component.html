@@ -7,13 +7,13 @@
             <button mat-fab (click)="login()" color="accent">
                 <mat-icon aria-label="Login">exit_to_app</mat-icon>
             </button>
-            <button mat-fab (click)="signup()" color="accent">
+            <button mat-fab (click)="signUp()" color="accent">
                 <mat-icon aria-label="Login">person_add</mat-icon>
             </button>
         </span>
     </div>
     <mat-list>
-        <mat-list-item *ngFor="let room of roomsObs | async">
+        <mat-list-item *ngFor="let room of rooms">
             <div class="dashboard-room full-size">
                 <div class="dashboard-room-name">{{room.name}}</div>
                 <button mat-icon-button (click)="openRoom(room.id)" color="accent">

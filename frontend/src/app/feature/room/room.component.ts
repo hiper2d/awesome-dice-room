@@ -9,7 +9,6 @@ import {WithWebSocket} from '../../util/web-socket/with-web-socket';
 import {RoomService} from '../../core/service/room.service';
 import {ApiConst} from '../../util/api.const';
 import {PlayerService} from '../../core/service/player.service';
-import {BehaviorSubject} from 'rxjs';
 import {Queue} from '../../util/queue';
 import {RoomMessage} from '../../model/room-message';
 import {flatMap, map, tap} from 'rxjs/operators';
@@ -29,8 +28,6 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   currentPlayer: Player;
 
   private room: RoomFull;
-  private playersSbj = new BehaviorSubject<Array<Player>>([]);
-  playersObj = this.playersSbj.asObservable();
 
   constructor(
     private roomService: RoomService,
@@ -144,7 +141,6 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   private addPlayerTab(player: Player) {
     if (this.room.players.indexOf(player) === -1) {
       this.room.players.push(player);
-      this.playersSbj.next(this.room.players);
     }
   }
 

@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from '@angular/forms';
 import {ErrorStateMatcher, MatDialogRef} from '@angular/material';
 
-/** Error when invalid control is dirty, touched, or submitted. */
-export class EmailErrorStateMatcher implements ErrorStateMatcher {
+class EmailErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
     const isSubmitted = form && form.submitted;
     return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
@@ -11,7 +10,7 @@ export class EmailErrorStateMatcher implements ErrorStateMatcher {
 }
 
 @Component({
-  selector: 'app-register-dialog',
+  selector: 'sign-up-dialog',
   templateUrl: './sign-up-dialog.component.html',
   styleUrls: ['./sign-up-dialog.component.scss']
 })

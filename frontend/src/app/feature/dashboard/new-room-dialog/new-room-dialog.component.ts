@@ -4,17 +4,17 @@ import {Room} from '../../../model/room';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 
 @Component({
-  selector: 'create-room-dialog',
-  templateUrl: './create-room-dialog.component.html',
-  styleUrls: ['./create-room-dialog.component.scss']
+  selector: 'new-room-dialog',
+  templateUrl: './new-room-dialog.component.html',
+  styleUrls: ['./new-room-dialog.component.scss']
 })
-export class CreateRoomDialogComponent {
+export class NewRoomDialogComponent {
 
   roomForm: FormGroup;
 
   constructor(
     fb: FormBuilder,
-    private dialogRef: MatDialogRef<CreateRoomDialogComponent>
+    private dialogRef: MatDialogRef<NewRoomDialogComponent>
   ) {
     this.roomForm = fb.group({
       name: ['', Validators.required],

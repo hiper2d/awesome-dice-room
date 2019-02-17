@@ -6,11 +6,10 @@ import {WsMessage} from '../../model/ws-message';
 import {WsDashboardMessageType} from '../../util/web-socket/ws-message-type';
 import {UserService} from '../../core/service/user.service';
 import {Room} from '../../model/room';
-import {BehaviorSubject} from 'rxjs';
 import {filter, flatMap, tap} from 'rxjs/operators';
 import {ApiConst} from '../../util/api.const';
 import {MatDialog} from '@angular/material';
-import {CreateRoomDialogComponent} from './create-room-dialog/create-room-dialog.component';
+import {NewRoomDialogComponent} from './new-room-dialog/new-room-dialog.component';
 import {LoginDialogComponent} from './login-dialog/login-dialog.component';
 import {SignUpDialogComponent} from './sign-up-dialog/sign-up-dialog.component';
 
@@ -22,8 +21,6 @@ import {SignUpDialogComponent} from './sign-up-dialog/sign-up-dialog.component';
 export class DashboardComponent extends WithWebSocket implements OnInit, OnDestroy {
 
   private rooms: Array<Room> = [];
-  private roomsSbj = new BehaviorSubject<Array<Room>>(this.rooms);
-  roomsObs = this.roomsSbj.asObservable();
 
   constructor(
     public roomService: RoomService,
@@ -56,7 +53,7 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
       .subscribe();
   }
 
-  signup() {
+  signUp() {
     this.dialog.open(SignUpDialogComponent).afterClosed()
       .pipe(
         tap((res) => console.log(res))
@@ -65,24 +62,16 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   }
 
   addRoom() {
-    this.dialog.open(CreateRoomDialogComponent).afterClosed()
+    this.dialog.open(NewRoomDialogComponent).afterClosed()
       .pipe(
         filter(obj => obj != null),
-        flatMap((room: Room) => this.roomService.createRoom(room)),
-        tap(createdRoom => {
-          this.rooms.unshift(createdRoom);
-          this.roomsSbj.next(this.rooms);
-        })
+        flatMap((room: Room) => this.roomService.createRoom(room))
       )
       .subscribe(createdRoom => this.notifyOthers(createdRoom.id, WsDashboardMessageType.NEW_ROOM));
   }
 
   removeRoom(id: string) {
     this.roomService.deleteRoom(id)
-      .pipe(tap(() => {
-        this.rooms.splice(this.rooms.findIndex(r => r.id === id), 1);
-        this.roomsSbj.next(this.rooms);
-      }))
       .subscribe(() => this.notifyOthers(id, WsDashboardMessageType.REMOVE_ROOM));
   }
 
@@ -91,7 +80,6 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   private loadRooms() {
     this.roomService.allRooms().subscribe(rooms => {
       this.rooms = rooms;
-      this.roomsSbj.next(rooms);
     });
   }
 
