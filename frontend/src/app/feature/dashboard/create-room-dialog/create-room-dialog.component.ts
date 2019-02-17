@@ -10,20 +10,20 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 })
 export class CreateRoomDialogComponent {
 
-  roomCreateForm: FormGroup;
+  roomForm: FormGroup;
 
   constructor(
     fb: FormBuilder,
     private dialogRef: MatDialogRef<CreateRoomDialogComponent>
   ) {
-    this.roomCreateForm = fb.group({
+    this.roomForm = fb.group({
       name: ['', Validators.required],
       description: ['', Validators.required]
     });
   }
 
   onAccept() {
-    const room = this.roomCreateForm.value as Room;
+    const room = this.roomForm.value as Room;
     console.log(room);
     this.dialogRef.close(new Room(null, room.name, room.description));
   }

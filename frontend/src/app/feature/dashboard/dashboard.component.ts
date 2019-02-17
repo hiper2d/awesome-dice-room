@@ -11,6 +11,8 @@ import {filter, flatMap, tap} from 'rxjs/operators';
 import {ApiConst} from '../../util/api.const';
 import {MatDialog} from '@angular/material';
 import {CreateRoomDialogComponent} from './create-room-dialog/create-room-dialog.component';
+import {LoginDialogComponent} from './login-dialog/login-dialog.component';
+import {SignUpDialogComponent} from './sign-up-dialog/sign-up-dialog.component';
 
 @Component({
   selector: 'dashboard',
@@ -44,6 +46,22 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
 
   ngOnDestroy(): void {
     this.disconnect();
+  }
+
+  login() {
+    this.dialog.open(LoginDialogComponent).afterClosed()
+      .pipe(
+        tap((res) => console.log(res))
+      )
+      .subscribe();
+  }
+
+  signup() {
+    this.dialog.open(SignUpDialogComponent).afterClosed()
+      .pipe(
+        tap((res) => console.log(res))
+      )
+      .subscribe();
   }
 
   addRoom() {

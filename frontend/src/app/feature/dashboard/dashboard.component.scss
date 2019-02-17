@@ -17,10 +17,13 @@ button {
   background-color: #393939;
   color: #fff;
 
-  &-room,
   &-buttons {
     display: flex;
-    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  &-room {
+    display: flex;
   }
 
   &-room-name {

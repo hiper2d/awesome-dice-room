@@ -1,0 +1,14 @@
+<form [formGroup]="loginForm">
+    <mat-form-field class="full-width">
+        <input matInput placeholder="username" autocomplete="off" formControlName="username" required autofocus>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+        <input matInput type="password" placeholder="Password" autocomplete="off" formControlName="password" required>
+    </mat-form-field>
+
+    <div mat-dialog-actions>
+        <button mat-button (click)="onCancel()">Cancel</button>
+        <button mat-button (click)="onAccept()" [disabled]="!loginForm.valid">Login</button>
+    </div>
+</form>
