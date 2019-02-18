@@ -18,7 +18,7 @@ export class NewRoomDialogComponent {
   ) {
     this.roomForm = fb.group({
       name: ['', Validators.required],
-      description: ['', Validators.required]
+      description: ['']
     });
   }
 
