@@ -27,7 +27,6 @@ export class LoginDialogComponent {
 
   onAccept() {
     this.userService.login(this.loginForm.value)
-      .pipe(tap(v => console.log(v)))
       .subscribe(() => this.dialogRef.close());
   }
 

@@ -47,16 +47,11 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   }
 
   login() {
-    this.dialog.open<LoginDialogComponent, Credentials>(LoginDialogComponent).afterClosed()
-      .subscribe(creds => console.log(creds));
+    this.dialog.open<LoginDialogComponent, Credentials>(LoginDialogComponent).afterClosed().subscribe();
   }
 
   signUp() {
-    this.dialog.open(SignUpDialogComponent).afterClosed()
-      .pipe(
-        tap((res) => console.log(res))
-      )
-      .subscribe();
+    this.dialog.open(SignUpDialogComponent).afterClosed().subscribe();
   }
 
   addRoom() {
