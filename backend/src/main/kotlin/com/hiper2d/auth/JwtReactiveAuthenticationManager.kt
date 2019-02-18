@@ -11,8 +11,7 @@ import reactor.core.publisher.Mono
 
 class JwtReactiveAuthenticationManager(private val userRepository: UserRepository): ReactiveAuthenticationManager {
 
-    override fun authenticate(authentication: Authentication): Mono<Authentication> =
-        authenticateToken(authentication)
+    override fun authenticate(authentication: Authentication): Mono<Authentication> = authenticateToken(authentication)
 
     private fun authenticateToken(token: Authentication): Mono<Authentication> {
         return when (token) {
@@ -29,7 +28,5 @@ class JwtReactiveAuthenticationManager(private val userRepository: UserRepositor
             .map { JwtAuthenticationToken(it.username, it.authorities) as Authentication }
     }
 
-    private fun <T> raiseBadCredentials(): Mono<T> {
-        return Mono.error(BadCredentialsException("Invalid Credentials"))
-    }
+    private fun <T> raiseBadCredentials(): Mono<T> = Mono.error(BadCredentialsException("Invalid Credentials"))
 }

@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
+import com.hiper2d.util.filterWithEmpty
+import com.hiper2d.util.mapIfNotEmpty
 
 class AuthenticationTokenConverter(private val jwtConfig: JwtConfigService): ServerAuthenticationConverter {
 
@@ -19,12 +21,10 @@ class AuthenticationTokenConverter(private val jwtConfig: JwtConfigService): Ser
             .switchIfEmpty(Mono.just(GuestAuthenticationToken()))
 
     private fun extractJwtToken(request: ServerHttpRequest): Mono<Authentication> {
-        val tokenHeader = request.getTokenHeader()
-        if (tokenHeader != null && tokenHeader.isToken()) {
-            val stringToken = tokenHeader.getToken()
-            return verifyAndBuildTokenObject(stringToken)
-        }
-        return Mono.empty<Authentication>()
+        return Mono.justOrEmpty(request.getTokenHeader())
+            .filterWithEmpty { it.isToken() }
+            .mapIfNotEmpty { it.getToken() }
+            .flatMap { verifyAndBuildTokenObject(it)}
     }
 
     private fun verifyAndBuildTokenObject(stringToken: String): Mono<Authentication> =
