@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from '@angular/forms';
 import {ErrorStateMatcher, MatDialogRef} from '@angular/material';
+import {UserService} from '../../../core/service/user.service';
 
 class EmailErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -21,7 +22,8 @@ export class SignUpDialogComponent implements OnInit {
 
   constructor(
     fb: FormBuilder,
-    private dialogRef: MatDialogRef<void>
+    private dialogRef: MatDialogRef<void>,
+    private userService: UserService
   ) {
     this.signUpForm = fb.group({
       username: ['', Validators.required],
@@ -34,7 +36,8 @@ export class SignUpDialogComponent implements OnInit {
   }
 
   onAccept() {
-    this.dialogRef.close(this.signUpForm.value);
+    this.userService.signUp(this.signUpForm.value)
+      .subscribe(() => this.dialogRef.close());
   }
 
   onCancel = () => this.dialogRef.close();

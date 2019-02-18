@@ -18,8 +18,8 @@ class GameRouter {
         POST("/api/token").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, authHandler::authenticate)
         }
-        POST("/api/reg").nest {
-            accept(MediaType.APPLICATION_JSON_UTF8, authHandler::authenticate)
+        POST("/api/signup").nest {
+            accept(MediaType.APPLICATION_JSON_UTF8, authHandler::signUp)
         }
     }
 

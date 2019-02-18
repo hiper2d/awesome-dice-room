@@ -2,6 +2,8 @@ import {Component} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {MatDialogRef} from '@angular/material';
 import {Room} from '../../../model/room';
+import {UserService} from '../../../core/service/user.service';
+import {tap} from 'rxjs/operators';
 
 @Component({
   selector: 'login-dialog',
@@ -14,7 +16,8 @@ export class LoginDialogComponent {
 
   constructor(
     fb: FormBuilder,
-    private dialogRef: MatDialogRef<void>
+    private dialogRef: MatDialogRef<void>,
+    private userService: UserService
   ) {
     this.loginForm = fb.group({
       username: ['', Validators.required],
@@ -23,7 +26,9 @@ export class LoginDialogComponent {
   }
 
   onAccept() {
-    this.dialogRef.close(this.loginForm.value);
+    this.userService.login(this.loginForm.value)
+      .pipe(tap(v => console.log(v)))
+      .subscribe(() => this.dialogRef.close());
   }
 
   onCancel = () => this.dialogRef.close();

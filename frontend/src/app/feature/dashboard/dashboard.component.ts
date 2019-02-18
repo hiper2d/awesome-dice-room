@@ -12,6 +12,7 @@ import {MatDialog} from '@angular/material';
 import {NewRoomDialogComponent} from './new-room-dialog/new-room-dialog.component';
 import {LoginDialogComponent} from './login-dialog/login-dialog.component';
 import {SignUpDialogComponent} from './sign-up-dialog/sign-up-dialog.component';
+import {Credentials} from '../../model/credentials';
 
 @Component({
   selector: 'dashboard',
@@ -46,11 +47,8 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   }
 
   login() {
-    this.dialog.open(LoginDialogComponent).afterClosed()
-      .pipe(
-        tap((res) => console.log(res))
-      )
-      .subscribe();
+    this.dialog.open<LoginDialogComponent, Credentials>(LoginDialogComponent).afterClosed()
+      .subscribe(creds => console.log(creds));
   }
 
   signUp() {

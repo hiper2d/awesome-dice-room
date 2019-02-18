@@ -7,6 +7,7 @@ import com.hiper2d.model.User
 import com.hiper2d.repository.UserRepository
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.security.core.userdetails.UserDetails
@@ -23,15 +24,18 @@ class AuthHandler @Autowired constructor(
     private val encoder: PasswordEncoder
 ) {
 
-    fun register(request: ServerRequest): Mono<ServerResponse> {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    fun signUp(request: ServerRequest): Mono<ServerResponse> {
         return request.bodyToMono(JwtAuthenticationRequest::class.java)
-            .flatMap { createUser(it) }
+            .flatMap { createUser(it) } // todo: add check if the user exists
             .flatMap {
                 ServerResponse.ok()
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .build()
             }
             .onErrorResume {
+                logger.error("Failed to create a user", it)
                 ServerResponse.status(500).build()
             }
     }
@@ -48,7 +52,7 @@ class AuthHandler @Autowired constructor(
 
     private fun createUser(token: JwtAuthenticationRequest): Mono<User> =
         Mono.just(User(name = token.username, password = encoder.encode(token.password), roles = emptyList()))
-            .flatMap { userRepository.save(it) }
+            .flatMap { userRepository.insert(it) }
 
     private fun findUser(token: JwtAuthenticationRequest): Mono<User> =
         userRepository.findByName(token.username)
