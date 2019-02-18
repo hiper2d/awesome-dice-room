@@ -10,10 +10,10 @@ import org.springframework.security.core.userdetails.UserDetails
 
 @Document(collection = "user")
 class User @JsonCreator(mode=JsonCreator.Mode.PROPERTIES) constructor(
-    @Id val id: String? = null,
-    private val name: String,
-    private val password: String,
-    private val roles: List<String>
+    @Id var id: String? = null,
+    val name: String,
+    val roles: List<String>,
+    private val password: String
 ): UserDetails {
 
     override fun getAuthorities(): Collection<GrantedAuthority> = roles.map { SimpleGrantedAuthority(it) }
