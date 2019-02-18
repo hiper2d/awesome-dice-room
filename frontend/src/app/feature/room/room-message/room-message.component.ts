@@ -17,17 +17,4 @@ export class RoomMessageComponent implements OnInit {
         this.sanitizedMessage = this.sanitizer.sanitize(SecurityContext.HTML, this.message.body);
         console.log(this.message.author);
     }
-
-    getAuthorClass() {
-        return {
-            system: this.message.author.system,
-            [this.message.author.color]: !this.message.author.system
-        };
-    }
-
-    getMessageClass() {
-        return {
-            system: this.message.author.system
-        };
-    }
 }
