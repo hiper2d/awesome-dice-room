@@ -14,7 +14,7 @@ fun <T, R> Mono<T?>.flatMapIfNotEmpty(f: (T) -> Mono<R>): Mono<R> {
     else this.flatMap { v -> f(v!!) }
 }
 
-fun <T> Mono<T?>.filterWithEmpty(p: (T) -> Boolean): Mono<T?> {
+fun <T> Mono<T?>.filterIfNotEmpty(p: (T) -> Boolean): Mono<T?> {
     return if (this.isEmpty()) return this
     else this.filter { v -> p(v!!) }
 }
