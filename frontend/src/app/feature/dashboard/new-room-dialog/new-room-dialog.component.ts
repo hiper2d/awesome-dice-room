@@ -24,7 +24,6 @@ export class NewRoomDialogComponent {
 
   onAccept() {
     const room = this.roomForm.value as Room;
-    console.log(room);
     this.dialogRef.close(new Room(null, room.name, room.description));
   }
 

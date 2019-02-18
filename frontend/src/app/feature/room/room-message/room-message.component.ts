@@ -15,6 +15,7 @@ export class RoomMessageComponent implements OnInit {
 
     ngOnInit(): void {
         this.sanitizedMessage = this.sanitizer.sanitize(SecurityContext.HTML, this.message.body);
+        console.log(this.message.author);
     }
 
     getAuthorClass() {

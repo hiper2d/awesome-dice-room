@@ -11,13 +11,11 @@
 
 <form *ngIf="!readonly" class="player-inventory" #inventoryForm="ngForm">
     <div class="inventory-buttons">
-        <button mat-icon-button (click)="addItem()" color="accent">
+        <button mat-icon-button (click)="addItem()" color="primary">
             <mat-icon>add_circle</mat-icon>
         </button>
-        <button mat-icon-button
-                [disabled]="!inventoryForm.valid || inventoryForm.pristine"
-                (click)="onSave();inventoryForm.form.markAsPristine()"
-                color="accent">
+        <button mat-icon-button [disabled]="!inventoryForm.valid || inventoryForm.pristine" color="primary"
+                (click)="onSave();inventoryForm.form.markAsPristine()">
             <mat-icon>save</mat-icon>
         </button>
     </div>
