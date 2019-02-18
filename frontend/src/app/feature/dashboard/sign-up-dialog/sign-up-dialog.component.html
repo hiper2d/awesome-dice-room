@@ -1,9 +1,9 @@
 <form [formGroup]="signUpForm">
-  <mat-form-field color="accent" class="full-width">
+  <mat-form-field class="full-width">
     <input matInput placeholder="Username" autocomplete="off" formControlName="username" required autofocus>
   </mat-form-field>
 
-  <mat-form-field color="accent" class="full-width">
+  <mat-form-field class="full-width">
     <input matInput placeholder="Email" formControlName="email" autocomplete="off" [errorStateMatcher]="matcher">
     <mat-error *ngIf="signUpForm.get('email').hasError('email') && !signUpForm.get('email').hasError('required')">
       Please enter a valid email address
@@ -13,7 +13,7 @@
     </mat-error>
   </mat-form-field>
 
-  <mat-form-field color="accent" class="full-width">
+  <mat-form-field class="full-width">
     <input matInput type="password" placeholder="Password" autocomplete="off" formControlName="password" required>
   </mat-form-field>
 

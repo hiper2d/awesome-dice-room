@@ -1,13 +1,13 @@
 <div class="dashboard full-size">
     <div class="dashboard-buttons">
-        <button mat-fab (click)="addRoom()" color="accent">
+        <button mat-fab color="primary" (click)="addRoom()">
             <mat-icon aria-label="Add room">add</mat-icon>
         </button>
         <span>
-            <button mat-fab (click)="login()" color="accent">
+            <button mat-fab color="primary" (click)="login()">
                 <mat-icon aria-label="Login">exit_to_app</mat-icon>
             </button>
-            <button mat-fab (click)="signUp()" color="accent">
+            <button mat-fab color="primary" (click)="signUp()">
                 <mat-icon aria-label="Login">person_add</mat-icon>
             </button>
         </span>
@@ -16,7 +16,7 @@
         <mat-list-item *ngFor="let room of rooms">
             <div class="dashboard-room full-size">
                 <div class="dashboard-room-name">{{room.name}}</div>
-                <button mat-icon-button (click)="openRoom(room.id)" color="accent">
+                <button mat-icon-button color="primary" (click)="openRoom(room.id)">
                     <mat-icon>forward</mat-icon>
                 </button>
                 <button mat-icon-button (click)="removeRoom(room.id)" color="warn">

@@ -13,16 +13,16 @@
         </mat-list>
     </div>
 
-    <mat-form-field class="message-input">
+    <mat-form-field class="message-input" color="accent">
         <input matInput autocomplete="off" [(ngModel)]="message" (keyup.enter)="onSendMessage()" autofocus>
     </mat-form-field>
 </div>
 
 <div class="play-area bottom">
-  <mat-tab-group color="accent">
+  <mat-tab-group>
     <mat-tab *ngFor="let player of room?.players" [label]="player.name">
         <ng-template mat-tab-label>
-            <mat-icon class="mat-accent">done</mat-icon>
+            <mat-icon color="primary">done</mat-icon>
             <span class="tab-header-text">{{ player.name }}</span>
         </ng-template>
         <div class="tab-body">
