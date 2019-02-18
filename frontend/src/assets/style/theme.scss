@@ -5,7 +5,7 @@ $primary: mat-palette($mat-green, A200);
 $accent: mat-palette($mat-purple);
 $warn: mat-palette($mat-red);
 
-$theme: mat-dark-theme($primary, $accent, $warn);
+$theme: mat-dark-theme($primary, $accent);
 
 @include angular-material-theme($theme);
 
