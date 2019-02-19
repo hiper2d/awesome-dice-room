@@ -28,7 +28,7 @@ internal class RoomHandlerTest: BaseTest() {
         val newRoomJson = mapper.writeValueAsString(newRoom)
         val updatedRoom = updateRoom(newRoomJson)
 
-        assertEquals("Updated", updatedRoom?.name)
+        assertEquals("Updated", updatedRoom.name)
     }
 
     @Test
