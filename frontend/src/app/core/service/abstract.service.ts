@@ -23,6 +23,10 @@ export abstract class AbstractService {
     return this.http.post<R>(url, body, { params: params });
   }
 
+  protected postForText<T>(url: string, body: T): Observable<string> {
+    return this.http.post(url, body, { responseType: 'text' });
+  }
+
   protected put<T>(args: Args<T>): Observable<T> {
     return this.http.put<T>(args.url, args.body, { params: args.params });
   }

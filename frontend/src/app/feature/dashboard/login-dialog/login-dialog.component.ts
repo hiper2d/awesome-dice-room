@@ -8,7 +8,7 @@ import {tap} from 'rxjs/operators';
 @Component({
   selector: 'login-dialog',
   templateUrl: './login-dialog.component.html',
-  styleUrls: ['/login-dialog.component.scss']
+  styleUrls: ['/getAuthToken-dialog.component.scss']
 })
 export class LoginDialogComponent {
 
@@ -26,8 +26,8 @@ export class LoginDialogComponent {
   }
 
   onAccept() {
-    this.userService.login(this.loginForm.value)
-      .subscribe(() => this.dialogRef.close());
+    this.userService.getAuthToken(this.loginForm.value)
+      .subscribe();
   }
 
   onCancel = () => this.dialogRef.close();

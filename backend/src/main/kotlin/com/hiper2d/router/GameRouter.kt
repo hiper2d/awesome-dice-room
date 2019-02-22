@@ -16,7 +16,7 @@ class GameRouter {
     @Bean
     fun loginRoute(authHandler: AuthHandler): RouterFunction<ServerResponse> = router {
         POST("/api/token").nest {
-            accept(MediaType.APPLICATION_JSON_UTF8, authHandler::authenticate)
+            accept(MediaType.APPLICATION_JSON_UTF8, authHandler::generateToken)
         }
         POST("/api/signup").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, authHandler::signUp)
