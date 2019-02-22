@@ -2,7 +2,6 @@ package com.hiper2d.handler
 
 import com.hiper2d.auth.JwtConfigService
 import com.hiper2d.auth.model.JwtAuthenticationRequest
-import com.hiper2d.auth.model.JwtAuthenticationResponse
 import com.hiper2d.model.User
 import com.hiper2d.repository.UserRepository
 import io.jsonwebtoken.Jwts
@@ -40,14 +39,14 @@ class AuthHandler @Autowired constructor(
             }
     }
 
-    fun authenticate(request: ServerRequest): Mono<ServerResponse> {
+    fun generateToken(request: ServerRequest): Mono<ServerResponse> {
         val user = request.bodyToMono(JwtAuthenticationRequest::class.java)
             .flatMap { findUser(it) }
-            .map { JwtAuthenticationResponse(it.username, generateJwtToken(it)) }
+            .map { generateJwtToken(it) }
 
         return ServerResponse.ok()
             .contentType(MediaType.APPLICATION_JSON_UTF8)
-            .body(user, JwtAuthenticationResponse::class.java)
+            .body(user, String::class.java)
     }
 
     private fun createUser(token: JwtAuthenticationRequest): Mono<User> =
