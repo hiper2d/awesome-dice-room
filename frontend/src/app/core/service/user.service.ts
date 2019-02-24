@@ -5,7 +5,6 @@ import {Observable} from 'rxjs';
 import {Credentials} from '../../model/credentials';
 import {ApiConst} from '../../util/api.const';
 import {tap} from 'rxjs/operators';
-import { JwtHelperService } from '@auth0/angular-jwt';
 import {Token} from '../../model/token';
 import {Generator} from '../../util/generator';
 
@@ -14,10 +13,9 @@ import {Generator} from '../../util/generator';
 })
 export class UserService extends AbstractService {
 
+  authenticated = false;
   id = Generator.uuid(); // todo: we won't send user id from backend, need to get rid of it
   name = 'Guest';
-
-  private helper = new JwtHelperService();
 
   constructor(http: HttpClient) {
     super(http);
@@ -31,7 +29,9 @@ export class UserService extends AbstractService {
     return this.postForText<Credentials>(ApiConst.API_TOKEN, credentials)
       .pipe(
         tap(tokenStr => {
-          const tokenObj = this.helper.decodeToken(tokenStr) as Token;
+          const parts = tokenStr.split('.');
+          const tokenObj = JSON.parse(atob(parts[1])) as Token;
+          this.authenticated = true;
           this.name = tokenObj.sub;
         })
       );
