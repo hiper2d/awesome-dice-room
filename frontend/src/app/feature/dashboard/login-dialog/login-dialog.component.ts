@@ -8,7 +8,7 @@ import {tap} from 'rxjs/operators';
 @Component({
   selector: 'login-dialog',
   templateUrl: './login-dialog.component.html',
-  styleUrls: ['/getAuthToken-dialog.component.scss']
+  styleUrls: ['/login-dialog.component.scss']
 })
 export class LoginDialogComponent {
 
