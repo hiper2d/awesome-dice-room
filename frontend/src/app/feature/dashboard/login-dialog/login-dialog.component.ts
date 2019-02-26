@@ -1,9 +1,14 @@
 import {Component} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {MatDialogRef} from '@angular/material';
-import {Room} from '../../../model/room';
+import {AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, ValidatorFn, Validators} from '@angular/forms';
+import {ErrorStateMatcher, MatDialogRef} from '@angular/material';
 import {UserService} from '../../../core/service/user.service';
-import {tap} from 'rxjs/operators';
+
+class UsernameErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+  }
+}
 
 @Component({
   selector: 'login-dialog',
@@ -13,6 +18,8 @@ import {tap} from 'rxjs/operators';
 export class LoginDialogComponent {
 
   loginForm: FormGroup;
+  matcher = new UsernameErrorStateMatcher();
+  invalidUsernameOrPassword = false;
 
   constructor(
     fb: FormBuilder,
@@ -20,14 +27,33 @@ export class LoginDialogComponent {
     private userService: UserService
   ) {
     this.loginForm = fb.group({
-      username: ['', Validators.required],
+      username: ['', [Validators.required, this.userAlreadyExistsValidator()]],
       password: ['', Validators.required]
     });
   }
 
+  private userAlreadyExistsValidator(): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} | null => {
+      return this.invalidUsernameOrPassword ? {'invalid': {value: control.value}} : null;
+    };
+  }
+
+  onKeyDown() {
+    this.invalidUsernameOrPassword = false;
+  }
+
   onAccept() {
+    this.invalidUsernameOrPassword = false;
     this.userService.getAuthToken(this.loginForm.value)
-      .subscribe();
+      .subscribe(
+        () => {
+          this.dialogRef.close();
+        },
+        (error) => {
+          this.invalidUsernameOrPassword = true;
+          this.loginForm.get('username').updateValueAndValidity();
+          console.log(error);
+        });
   }
 
   onCancel = () => this.dialogRef.close();

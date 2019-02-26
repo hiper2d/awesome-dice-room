@@ -1,6 +1,9 @@
 <form [formGroup]="loginForm">
     <mat-form-field class="full-width">
-        <input matInput placeholder="username" autocomplete="off" formControlName="username" required autofocus>
+        <input matInput placeholder="username" autocomplete="off" formControlName="username" [errorStateMatcher]="matcher" required autofocus (keydown)="onKeyDown()">
+        <mat-error *ngIf="loginForm.get('username').hasError('invalid')">
+            Invalid username or password
+        </mat-error>
     </mat-form-field>
 
     <mat-form-field class="full-width">
