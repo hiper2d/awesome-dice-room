@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from '@angular/forms';
 import {ErrorStateMatcher, MatDialogRef} from '@angular/material';
 import {UserService} from '../../../core/service/user.service';
@@ -26,9 +26,9 @@ export class SignUpDialogComponent implements OnInit {
     private userService: UserService
   ) {
     this.signUpForm = fb.group({
-      username: ['', Validators.required],
+      username: new FormControl('', Validators.required),
       email: new FormControl('', [Validators.required, Validators.email]),
-      password: ['', Validators.required]
+      password: new FormControl('', Validators.required)
     });
   }
 
@@ -37,7 +37,13 @@ export class SignUpDialogComponent implements OnInit {
 
   onAccept() {
     this.userService.signUp(this.signUpForm.value)
-      .subscribe(() => this.dialogRef.close());
+      .subscribe(
+        () => {
+          console.log('next');
+          this.dialogRef.close();
+        },
+        (error) => console.log(error)
+      );
   }
 
   onCancel = () => this.dialogRef.close();

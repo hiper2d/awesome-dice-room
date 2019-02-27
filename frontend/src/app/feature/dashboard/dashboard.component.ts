@@ -21,7 +21,7 @@ import {Credentials} from '../../model/credentials';
 })
 export class DashboardComponent extends WithWebSocket implements OnInit, OnDestroy {
 
-  private rooms: Array<Room> = [];
+  rooms: Array<Room> = [];
 
   constructor(
     public roomService: RoomService,

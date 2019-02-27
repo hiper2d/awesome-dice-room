@@ -19,9 +19,9 @@ class PlayerHandler(private val roomRepository: RoomRepository, private val play
 
     fun findOrCreate(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
         .contentType(MediaType.APPLICATION_JSON_UTF8)
-        .body(createPlayerAndUpdateRoom(req), Player::class.java)
+        .body(findOrCreatePlayerAndUpdateRoom(req), Player::class.java)
 
-    private fun createPlayerAndUpdateRoom(req: ServerRequest) =
+    private fun findOrCreatePlayerAndUpdateRoom(req: ServerRequest) =
         findOrCreatePlayer(req).flatMap { player ->
             player.id?.let {
                 this.roomRepository.addPlayerIdToRoom(roomId = player.roomId, playerId = player.id).map { player }
