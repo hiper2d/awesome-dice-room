@@ -6,7 +6,6 @@ import com.hiper2d.model.User
 import com.hiper2d.repository.UserRepository
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.security.core.userdetails.UserDetails
@@ -23,19 +22,13 @@ class AuthHandler @Autowired constructor(
     private val encoder: PasswordEncoder
 ) {
 
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     fun signUp(request: ServerRequest): Mono<ServerResponse> {
         return request.bodyToMono(JwtAuthenticationRequest::class.java)
-            .flatMap { createUser(it) } // todo: add check if the user exists
+            .flatMap { createUser(it) }
             .flatMap {
                 ServerResponse.ok()
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .build()
-            }
-            .onErrorResume {
-                logger.error("Failed to create a user", it)
-                ServerResponse.status(500).build()
             }
     }
 
@@ -50,16 +43,16 @@ class AuthHandler @Autowired constructor(
     }
 
     private fun createUser(token: JwtAuthenticationRequest): Mono<User> =
-        Mono.just(User(name = token.username, password = encoder.encode(token.password), roles = emptyList()))
-            .flatMap { userRepository.insert(it) }
+        userRepository.insert(User(
+            name = token.username,
+            password = encoder.encode(token.password),
+            roles = emptyList()
+        )).onErrorResume { Mono.error(RuntimeException("User already exists")) }
 
     private fun findUser(token: JwtAuthenticationRequest): Mono<User> =
         userRepository.findByName(token.username)
             .filter { encoder.matches(token.password, it.password) }
-            .switchIfEmpty(throwUserNotFoundException())
-
-    private fun throwUserNotFoundException(): Mono<User> =
-        Mono.error(RuntimeException("Invalid credentials"))
+            .switchIfEmpty(Mono.error(RuntimeException("Invalid credentials")))
 
     private fun generateJwtToken(it: UserDetails): String =
         Jwts.builder()
