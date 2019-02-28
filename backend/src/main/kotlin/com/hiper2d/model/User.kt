@@ -12,23 +12,27 @@ import org.springframework.security.core.userdetails.UserDetails
 @Document(collection = "user")
 class User @JsonCreator(mode=JsonCreator.Mode.PROPERTIES) constructor(
     @Id var id: String? = null,
-    @Indexed(unique = true)val name: String,
-    val roles: List<String>,
+    @Indexed(unique = true) private val name: String,
+    private val roles: List<String>,
     private val password: String
 ): UserDetails {
 
-    override fun getAuthorities(): Collection<GrantedAuthority> = roles.map { SimpleGrantedAuthority(it) }
-
-    override fun isEnabled() = true
-
     override fun getUsername() = name
 
+    override fun getAuthorities(): Collection<GrantedAuthority> = roles.map { SimpleGrantedAuthority(it) }
+
+    @JsonIgnore
+    override fun isEnabled() = true
+
+    @JsonIgnore
     override fun isCredentialsNonExpired() = true
 
     @JsonIgnore
     override fun getPassword() = password
 
+    @JsonIgnore
     override fun isAccountNonExpired() = true
 
+    @JsonIgnore
     override fun isAccountNonLocked() = true
 }
