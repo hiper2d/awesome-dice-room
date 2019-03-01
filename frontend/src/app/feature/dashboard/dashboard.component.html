@@ -4,12 +4,15 @@
             <mat-icon aria-label="Add room">add</mat-icon>
         </button>
         <span>
-            <button mat-fab color="primary" (click)="login()">
-                <mat-icon aria-label="Login">exit_to_app</mat-icon>
-            </button>
-            <button mat-fab color="primary" (click)="signUp()">
-                <mat-icon aria-label="Login">person_add</mat-icon>
-            </button>
+            <button *ngIf="userService.authenticated; else unauthorized" mat-fab color="primary" (click)="logout()" title="Exit">Exit</button>
+            <ng-template #unauthorized>
+                <button mat-fab color="primary" (click)="login()" title="Login">
+                    <mat-icon aria-label="Login">exit_to_app</mat-icon>
+                </button>
+                <button mat-fab color="primary" (click)="signUp()" title="Sign Up">
+                    <mat-icon aria-label="Login">person_add</mat-icon>
+                </button>
+            </ng-template>
         </span>
     </div>
     <mat-list>

@@ -15,7 +15,7 @@ export class UserService extends AbstractService {
 
   authenticated = false;
   id = Generator.uuid(); // todo: we won't send user id from backend, need to get rid of it
-  name = 'Guest';
+  name = 'Guest' + Generator.str(5);
 
   constructor(http: HttpClient) {
     super(http);
@@ -28,12 +28,23 @@ export class UserService extends AbstractService {
   getAuthToken(credentials: Credentials): Observable<string> {
     return this.postForText<Credentials>(ApiConst.API_TOKEN, credentials)
       .pipe(
-        tap(tokenStr => {
-          const parts = tokenStr.split('.');
-          const tokenObj = JSON.parse(atob(parts[1])) as Token;
-          this.authenticated = true;
-          this.name = tokenObj.sub;
+        tap(token => {
+          this.storeToken(token);
+          localStorage.setItem(ApiConst.LOCAL_STORAGE_TOKEN, token);
         })
       );
+  }
+
+  logout() {
+    this.authenticated = false;
+    this.name = 'Guest' + Generator.str(5);
+    localStorage.removeItem(ApiConst.LOCAL_STORAGE_TOKEN);
+  }
+
+  storeToken(token: String) {
+    const parts = token.split('.');
+    const tokenObj = JSON.parse(atob(parts[1])) as Token;
+    this.authenticated = true;
+    this.name = tokenObj.sub;
   }
 }
