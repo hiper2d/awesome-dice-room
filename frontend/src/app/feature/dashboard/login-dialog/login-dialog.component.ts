@@ -49,10 +49,9 @@ export class LoginDialogComponent {
         () => {
           this.dialogRef.close();
         },
-        (error) => {
+        () => {
           this.invalidUsernameOrPassword = true;
           this.loginForm.get('username').updateValueAndValidity();
-          console.log(error);
         });
   }
 

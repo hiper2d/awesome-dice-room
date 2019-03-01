@@ -50,6 +50,10 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
     this.dialog.open<LoginDialogComponent, Credentials>(LoginDialogComponent).afterClosed().subscribe();
   }
 
+  logout() {
+    this.userService.logout();
+  }
+
   signUp() {
     this.dialog.open(SignUpDialogComponent).afterClosed().subscribe();
   }
