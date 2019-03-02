@@ -32,8 +32,4 @@ export class PlayerService extends AbstractService {
   findOrCreatePlayer(player: Player): Observable<Player> {
     return this.post<Player>(ApiConst.API_PLAYERS_FIND_OR_CREATE, player);
   }
-
-  removePlayer(id: string): Observable<void> {
-    return this.delete<void>({ url: `${ApiConst.API_PLAYERS}/${id}` });
-  }
 }
