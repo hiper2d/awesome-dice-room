@@ -7,5 +7,5 @@ import reactor.core.publisher.Mono
 
 interface PlayerRepository: ReactiveMongoRepository<Player, String> {
     fun findAllByIdIn(list: List<String>): Flux<Player>
-    fun findByRoomIdAndUserId(roomId: String, userId: String): Mono<Player>
+    fun findByRoomIdAndName(roomId: String, name: String): Mono<Player>
 }

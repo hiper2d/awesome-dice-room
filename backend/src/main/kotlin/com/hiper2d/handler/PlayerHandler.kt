@@ -31,7 +31,7 @@ class PlayerHandler(private val roomRepository: RoomRepository, private val play
     private fun findOrCreatePlayer(req: ServerRequest) =
         req.bodyToMono<Player>().flatMap {
             playerRepository
-                .findByRoomIdAndUserId(it.roomId, it.userId)
+                .findByRoomIdAndName(it.roomId, it.name)
                 .switchIfEmpty(playerRepository.insert(it))
         }
 }
