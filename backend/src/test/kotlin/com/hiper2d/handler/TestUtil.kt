@@ -30,8 +30,8 @@ fun findRoom(id: String, webClient: WebTestClient): RoomFull {
         .blockFirst()!!
 }
 
-fun generateOrFindPlayer(name: String, userId: String, roomId: String, mapper: ObjectMapper, webClient: WebTestClient): Player {
-    val player = Player(id = null, name = name, userId = userId, roomId = roomId, avatar = "somepic", color = "test", inventory = null)
+fun generateOrFindPlayer(name: String, roomId: String, mapper: ObjectMapper, webClient: WebTestClient): Player {
+    val player = Player(id = null, name = name, roomId = roomId, avatar = "somepic", color = "test", inventory = null)
     val playerJson = mapper.writeValueAsString(player)
 
     return webClient.post().uri("/api/players/find-or-create")

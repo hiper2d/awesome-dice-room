@@ -10,7 +10,12 @@ import {HttpClient} from '@angular/common/http';
 })
 export class PlayerService extends AbstractService {
 
-  private _systemPlayer = Player.systemPlayer();
+  private _systemPlayer = new Player({
+    roomId: '0',
+    name: 'System',
+    avatar: 'assets/avatars/admin.png',
+    color: 'red'
+  });
 
   constructor(http: HttpClient) {
     super(http);

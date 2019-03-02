@@ -8,13 +8,12 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "player")
 @CompoundIndexes(value = [
-    CompoundIndex(name = "room_id_user_id", def = "{'userId' : 1, 'roomId': 1}")
+    CompoundIndex(name = "name_and_room_id_index", def = "{'name' : 1, 'roomId': 1}")
 ])
 data class Player(
     @Id val id: String?,
-    val userId: String,
     val roomId: String,
-    @Indexed(unique = true) val name: String,
+    val name: String,
     val avatar: String,
     val color: String,
     val inventory: Inventory?

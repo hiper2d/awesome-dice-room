@@ -33,8 +33,8 @@ internal class RoomHandlerTest: BaseTest() {
 
     @Test
     fun `then should create new player and update room playerIds`() {
-        val player1 = generateOrFindPlayer("Alex 1", "123", room.id!!, mapper, webClient)
-        val player2 = generateOrFindPlayer("Alex 2", "456", room.id!!, mapper, webClient)
+        val player1 = generateOrFindPlayer(name ="Alex 1", roomId = room.id!!, mapper = mapper, webClient = webClient)
+        val player2 = generateOrFindPlayer(name = "Alex 2", roomId = room.id!!, mapper = mapper, webClient = webClient)
         val updatedRoom = findRoom(room.id!!, webClient)
 
         assertThat(updatedRoom.players, Matchers.containsInAnyOrder(player1, player2))

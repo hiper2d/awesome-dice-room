@@ -9,7 +9,7 @@ data class WsRoomMessage(
     val type: String,
     val roomId: String,
     val data: Any?,
-    val senderId: String,
+    val sender: String,
     val direct: Boolean = false,
     val to: String = ""
 )

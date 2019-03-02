@@ -14,8 +14,7 @@ import {Generator} from '../../util/generator';
 export class UserService extends AbstractService {
 
   authenticated = false;
-  id = Generator.uuid(); // todo: we won't send user id from backend, need to get rid of it
-  name = 'Guest' + Generator.str(5);
+  name = this.generateGustName();
 
   constructor(http: HttpClient) {
     super(http);
@@ -37,7 +36,7 @@ export class UserService extends AbstractService {
 
   logout() {
     this.authenticated = false;
-    this.name = 'Guest' + Generator.str(5);
+    this.name = this.generateGustName();
     localStorage.removeItem(ApiConst.LOCAL_STORAGE_TOKEN);
   }
 
@@ -46,5 +45,9 @@ export class UserService extends AbstractService {
     const tokenObj = JSON.parse(atob(parts[1])) as Token;
     this.authenticated = true;
     this.name = tokenObj.sub;
+  }
+
+  private generateGustName() {
+    return 'Guest' + Generator.str(5);
   }
 }

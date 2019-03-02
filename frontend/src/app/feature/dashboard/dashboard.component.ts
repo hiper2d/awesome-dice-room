@@ -82,11 +82,6 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
 
   protected onMessage(result) {
     const message = JSON.parse(result.data) as WsMessage;
-
-    if (message.senderId === this.userService.id) {
-      return;
-    }
-
     switch (message.type) {
       case WsDashboardMessageType.NEW_ROOM:
       case WsDashboardMessageType.REMOVE_ROOM:
@@ -95,6 +90,6 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
   }
 
   private notifyOthers(roomId: string, messageType: WsDashboardMessageType) {
-    this.sendWsMessage({type: messageType, data: roomId});
+    this.sendWsMessage({ type: messageType, data: roomId });
   }
 }
