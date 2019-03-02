@@ -15,7 +15,7 @@ class RoomRepositoryImpl(@Autowired val mongoTemplate: ReactiveMongoTemplate): R
     override fun addPlayerIdToRoom(roomId: String, playerId: String): Mono<Long> =
         mongoTemplate.updateFirst(
             Query.query(Criteria.where("id").`is`(roomId)),
-            Update().push("playerIds", playerId),
+            Update().addToSet("playerIds", playerId),
             Room::class.java
         ).map { it.modifiedCount }
 

@@ -24,10 +24,9 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
 
   @ViewChild('chatbox') chatbox: ElementRef;
   chatMessages: Queue<RoomMessage> = new Queue(100);
-  message = '';
+  chatMessage = '';
   currentPlayer: Player;
-
-  private room: RoomFull;
+  room: RoomFull;
 
   constructor(
     private roomService: RoomService,
@@ -70,9 +69,9 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   }
 
   onSendMessage() {
-    if (this.message) {
-      this.notifyAll({ type: WsRoomMessageType.CHAT_MESSAGE, data: this.message });
-      this.message = '';
+    if (this.chatMessage) {
+      this.notifyAll({ type: WsRoomMessageType.CHAT_MESSAGE, data: this.chatMessage });
+      this.chatMessage = '';
     }
   }
 
@@ -148,13 +147,13 @@ export class RoomComponent extends WithWebSocket implements OnInit, OnDestroy {
   }
 
   private addPlayerTab(player: Player) {
-    if (this.room.players.indexOf(player) === -1) {
+    if (this.room.players.map(p => p.id).indexOf(player.id) === -1) {
       this.room.players.push(player);
     }
   }
 
   private removePlayerFromTab(player: Player) {
-    const pIndex = this.room.players.indexOf(player);
+    const pIndex = this.room.players.map(p => p.id).indexOf(player.id);
     if (pIndex !== -1) {
       this.room.players.splice(pIndex, 1);
     }
