@@ -39,7 +39,6 @@ export class SignUpDialogComponent implements OnInit {
     this.userService.signUp(this.signUpForm.value)
       .subscribe(
         () => {
-          console.log('next');
           this.dialogRef.close();
         },
         (error) => console.log(error)
