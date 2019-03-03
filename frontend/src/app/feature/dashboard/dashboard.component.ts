@@ -1,12 +1,12 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {RoomService} from '../../core/service/room.service';
-import {WithWebSocket} from '../../util/web-socket/with-web-socket';
+import {AbstractWebSocketHolder} from '../../util/web-socket/abstract-web-socket-holder';
 import {WsMessage} from '../../model/ws-message';
 import {WsDashboardMessageType} from '../../util/web-socket/ws-message-type';
 import {UserService} from '../../core/service/user.service';
 import {Room} from '../../model/room';
-import {filter, flatMap, tap} from 'rxjs/operators';
+import {filter, flatMap} from 'rxjs/operators';
 import {ApiConst} from '../../util/api.const';
 import {MatDialog} from '@angular/material';
 import {NewRoomDialogComponent} from './new-room-dialog/new-room-dialog.component';
@@ -19,7 +19,7 @@ import {Credentials} from '../../model/credentials';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent extends WithWebSocket implements OnInit, OnDestroy {
+export class DashboardComponent extends AbstractWebSocketHolder implements OnInit, OnDestroy {
 
   rooms: Array<Room> = [];
 
@@ -27,9 +27,9 @@ export class DashboardComponent extends WithWebSocket implements OnInit, OnDestr
     public roomService: RoomService,
     private router: Router,
     private dialog: MatDialog,
-    userService: UserService
+    private userService: UserService
   ) {
-    super(userService);
+    super();
   }
 
   ngOnInit(): void {

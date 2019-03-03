@@ -42,7 +42,7 @@ class RoomWebSocketHandler: AbstractWebSocketHandler<WsRoomMessage>() {
                 type = WebSocketMessageType.ROLL.toString(),
                 roomId = inMsg.roomId,
                 data = diceRoller.roll(inMsg.data as String),
-                sender = inMsg.sender
+                senderId = inMsg.senderId
             )
         )
     }
