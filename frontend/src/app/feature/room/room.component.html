@@ -14,19 +14,19 @@
     </div>
 
     <mat-form-field class="message-input" color="accent">
-        <input matInput autocomplete="off" [(ngModel)]="chatMessage" (keyup.enter)="onSendMessage()" autofocus>
+        <input matInput autocomplete="off" [(ngModel)]="chatMessage" (keyup.enter)="sendMessageToChatbox()" autofocus>
     </mat-form-field>
 </div>
 
 <div class="play-area bottom">
   <mat-tab-group>
-    <mat-tab *ngFor="let player of room?.players" [label]="player.name">
+    <mat-tab *ngFor="let player of roomSocketHolder?.playersObservable | async" [label]="player.name">
         <ng-template mat-tab-label>
             <mat-icon color="primary">done</mat-icon>
             <span class="tab-header-text">{{ player.name }}</span>
         </ng-template>
         <div class="tab-body">
-            <player-seat [player]="player" [readonly]="player.id !== currentPlayer?.id" (inventorySave)="onInventorySave($event)"></player-seat>
+            <player-seat [player]="player" [readonly]="player.id !== currentPlayer?.id" (inventorySave)="saveInventory($event)"></player-seat>
         </div>
     </mat-tab>
   </mat-tab-group>

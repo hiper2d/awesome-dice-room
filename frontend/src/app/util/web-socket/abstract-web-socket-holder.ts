@@ -2,24 +2,32 @@ import {WsMessage, WsMessageParam} from '../../model/ws-message';
 import {UserService} from '../../core/service/user.service';
 import {ApiConst} from '../api.const';
 
-export abstract class WithWebSocket {
+export abstract class AbstractWebSocketHolder {
+
   protected wsConnection: WebSocket;
+  protected constructor() {}
 
-  protected constructor(protected userService: UserService) {}
-
-  protected connect(topic: string) {
+  connect(topic: string) {
     this.wsConnection = new WebSocket(`${ApiConst.WS_HOST}/${topic}`);
     this.wsConnection.onmessage = (result) => this.onMessage(result);
     this.wsConnection.onopen = () => this.onWsOpen();
     this.wsConnection.onclose = () => this.onWsClose();
   }
 
-  protected sendWsMessage(params: WsMessageParam) {
-    this.wsConnection.send(JSON.stringify(params));
+  isConnected = () => this.wsConnection != null;
+
+  sendWsMessage(params: WsMessageParam) {
+    if (this.wsConnection) {
+      this.wsConnection.send(JSON.stringify(params));
+    } else {
+      throw new Error('Connection is already closed');
+    }
   }
 
-  protected disconnect() {
-    this.wsConnection.close();
+  disconnect() {
+    if (this.isConnected) {
+      this.wsConnection.close();
+    }
   }
 
   protected abstract onMessage(result);
