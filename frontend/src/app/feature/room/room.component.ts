@@ -1,11 +1,9 @@
-import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../core/service/user.service';
-import {WsMessage, WsMessageParam} from '../../model/ws-message';
 import {WsRoomMessageType} from '../../util/web-socket/ws-message-type';
 import {Player} from '../../model/player';
 import {Inventory} from '../../model/inventory';
-import {AbstractWebSocketHolder} from '../../util/web-socket/abstract-web-socket-holder';
 import {RoomService} from '../../core/service/room.service';
 import {ApiConst} from '../../util/api.const';
 import {PlayerService} from '../../core/service/player.service';
@@ -15,7 +13,7 @@ import {flatMap, map, tap} from 'rxjs/operators';
 import {RoomFull} from '../../model/room-rull';
 import {ExceptionUtil} from '../../util/exception.util';
 import {RoomSocketHolder} from './room-socket.holder';
-import {Observable} from 'rxjs';
+import {MatTab, MatTabGroup} from '@angular/material';
 
 @Component({
   selector: 'room',
@@ -25,11 +23,14 @@ import {Observable} from 'rxjs';
 export class RoomComponent implements OnInit, OnDestroy {
 
   @ViewChild('chatbox') chatbox: ElementRef;
-  roomSocketHolder: RoomSocketHolder;
   chatMessages: Queue<RoomMessage> = new Queue(100);
+  roomSocketHolder: RoomSocketHolder;
+
   chatMessage = '';
   currentPlayer: Player;
   room: RoomFull;
+
+  private currentPlayerTabIndex = 0;
 
   constructor(
     private roomService: RoomService,
@@ -63,6 +64,21 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.roomSocketHolder.disconnect();
+  }
+
+  getSelectedTabIndex() {
+    if (!this.currentPlayerTabIndex && this.room && this.room.players && this.currentPlayer) {
+      for (let i = 0; i < this.room.players.length; i++) {
+        if (!this.currentPlayerTabIndex) {
+          break;
+        }
+        if (this.room.players[i].id === this.currentPlayer.id) {
+          this.currentPlayerTabIndex = i;
+          break;
+        }
+      }
+    }
+    return this.currentPlayerTabIndex;
   }
 
   sendMessageToChatbox() {
