@@ -18,7 +18,6 @@ export class RoomSocketHolder extends AbstractWebSocketHolder {
 
   constructor(private readonly room: RoomFull, private readonly currentPlayer: Player, private playerService: PlayerService) {
     super();
-    this.addPlayerTab(currentPlayer);
     this.playersPublisher.next(room.players);
   }
 
