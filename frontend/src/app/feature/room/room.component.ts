@@ -13,7 +13,6 @@ import {flatMap, map, tap} from 'rxjs/operators';
 import {RoomFull} from '../../model/room-rull';
 import {ExceptionUtil} from '../../util/exception.util';
 import {RoomSocketHolder} from './room-socket.holder';
-import {MatTab, MatTabGroup} from '@angular/material';
 
 @Component({
   selector: 'room',
@@ -48,13 +47,11 @@ export class RoomComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.route.paramMap.pipe(
       map(params => params.get('roomId')),
-      flatMap(roomId => this.roomService.getRoom(roomId)),
-      tap(room => ExceptionUtil.throwIfEmpty(room, 'Room cannot be found')),
-      tap(room => this.room = room),
-      flatMap(room => this.playerService.findOrCreatePlayer(new Player({ name: this.userService.name, roomId: room.id }))),
-      tap(player => {
-        this.currentPlayer = player;
+      flatMap(roomId => this.createRoom(roomId)),
+      flatMap(room => this.createCurrentPlayer(room)),
+      tap(() => {
         this.createAndSetupWsHandler();
+        this.calculateCurrentPlayerTabIndex();
       })
     ).subscribe(
       () => this.roomSocketHolder.connect(`${ApiConst.WS_ROOM}/${this.room.id}`),
@@ -63,22 +60,9 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.roomSocketHolder.disconnect();
-  }
-
-  getSelectedTabIndex() {
-    if (!this.currentPlayerTabIndex && this.room && this.room.players && this.currentPlayer) {
-      for (let i = 0; i < this.room.players.length; i++) {
-        if (!this.currentPlayerTabIndex) {
-          break;
-        }
-        if (this.room.players[i].id === this.currentPlayer.id) {
-          this.currentPlayerTabIndex = i;
-          break;
-        }
-      }
+    if (this.roomSocketHolder) {
+      this.roomSocketHolder.disconnect();
     }
-    return this.currentPlayerTabIndex;
   }
 
   sendMessageToChatbox() {
@@ -93,7 +77,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   leaveRoom() {
-    if (this.roomSocketHolder.isConnected()) {
+    if (this.roomSocketHolder && this.roomSocketHolder.isConnected()) {
       this.roomSocketHolder.notifyAll({ type: WsRoomMessageType.DISCONNECT });
     }
     if (this.room && this.currentPlayer) {
@@ -110,7 +94,33 @@ export class RoomComponent implements OnInit, OnDestroy {
     ).subscribe();
   }
 
+  private calculateCurrentPlayerTabIndex() {
+    this.currentPlayerTabIndex = this.room.players.findIndex(p => p.id === this.currentPlayer.id);
+  }
+
   private updateChatboxScrollPosition() {
     setTimeout(() => this.chatbox.nativeElement.scrollTop = this.chatbox.nativeElement.scrollHeight);
+  }
+
+  private createRoom(roomId) {
+    return this.roomService.getRoom(roomId)
+      .pipe(
+        tap(room => this.room = room),
+        tap(room => ExceptionUtil.throwIfEmpty(room, `Room with id=${roomId} cannot be found`))
+      );
+  }
+
+  private createCurrentPlayer(room: RoomFull) {
+    return this.playerService.findOrCreatePlayer(new Player({ name: this.userService.name, roomId: room.id }))
+      .pipe(
+        tap(player => this.currentPlayer = player),
+        tap(player => this.addCurrentPlayerToRoomIfNeeded(player))
+      );
+  }
+
+  private addCurrentPlayerToRoomIfNeeded(player: Player) {
+    if (this.room.players.map(p => p.id).indexOf(player.id) === -1) {
+      this.room.players.push(player);
+    }
   }
 }
