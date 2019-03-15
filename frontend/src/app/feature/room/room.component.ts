@@ -73,7 +73,10 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   saveInventory(inventory: Inventory) {
-    this.roomSocketHolder.notifyAll({ type: WsRoomMessageType.INVENTORY, data: inventory });
+    this.currentPlayer.inventory = inventory;
+    this.playerService.updatePlayer(this.currentPlayer).subscribe(
+      () => this.roomSocketHolder.notifyAll({ type: WsRoomMessageType.INVENTORY, data: inventory }) // todo: pass player Id here
+    );
   }
 
   leaveRoom() {

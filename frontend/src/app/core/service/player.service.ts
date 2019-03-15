@@ -32,4 +32,8 @@ export class PlayerService extends AbstractService {
   findOrCreatePlayer(player: Player): Observable<Player> {
     return this.post<Player>(ApiConst.API_PLAYERS_FIND_OR_CREATE, player);
   }
+
+  updatePlayer(player: Player): Observable<Player> {
+    return this.put<Player>({ url: ApiConst.API_PLAYERS, body: player });
+  }
 }

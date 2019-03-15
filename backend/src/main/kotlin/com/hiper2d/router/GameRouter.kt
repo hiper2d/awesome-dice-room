@@ -50,6 +50,9 @@ class GameRouter {
         GET("/api/players/{id}").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, playerHandler::findPlayer)
         }
+        PUT("/api/players").nest {
+            accept(MediaType.APPLICATION_JSON_UTF8, playerHandler::updatePlayer)
+        }
         POST("/api/players/find-or-create").nest {
             accept(MediaType.APPLICATION_JSON_UTF8, playerHandler::findOrCreate)
         }

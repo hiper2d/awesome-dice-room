@@ -17,6 +17,10 @@ class PlayerHandler(private val roomRepository: RoomRepository, private val play
         .contentType(MediaType.APPLICATION_JSON_UTF8)
         .body(playerRepository.findById(req.pathVariable("id")), Player::class.java)
 
+    fun updatePlayer(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .body(req.bodyToMono<Player>().flatMap { playerRepository.save(it) }, Player::class.java)
+
     fun findOrCreate(req: ServerRequest): Mono<ServerResponse> = ServerResponse.ok()
         .contentType(MediaType.APPLICATION_JSON_UTF8)
         .body(findOrCreatePlayerAndUpdateRoom(req), Player::class.java)

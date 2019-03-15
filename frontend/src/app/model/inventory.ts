@@ -6,7 +6,6 @@ export class Inventory {
 
 export class Item {
   constructor(
-    public id: number,
     public name = '',
     public description = ''
   ) {}
