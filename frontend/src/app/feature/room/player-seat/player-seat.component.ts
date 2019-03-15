@@ -10,7 +10,7 @@ import {Inventory} from '../../../model/inventory';
 export class PlayerSeatComponent {
   @Input() player: Player;
   @Input() readonly = true;
-  @Output() inventorySave = new EventEmitter();
+  @Output() saveInventory = new EventEmitter();
 
-  onInventorySave = (inventory: Inventory) => this.inventorySave.emit(inventory);
+  onInventorySave = (inventory: Inventory) => this.saveInventory.emit(inventory);
 }
