@@ -5,7 +5,6 @@ import {Player} from '../../model/player';
 import {RoomMessage} from '../../model/room-message';
 import {PlayerService} from '../../core/service/player.service';
 import {RoomFull} from '../../model/room-rull';
-import {Inventory} from '../../model/inventory';
 import {AbstractWebSocketHolder} from '../../util/web-socket/abstract-web-socket-holder';
 
 export class RoomSocketHolder extends AbstractWebSocketHolder {
@@ -56,13 +55,8 @@ export class RoomSocketHolder extends AbstractWebSocketHolder {
         break;
 
       case WsRoomMessageType.INVENTORY:
-        const inventory: Inventory = message.data;
-        const items = inventory.items.reduce((acc, i) => `${acc}<br/> name: ${i.name} description: ${i.description}`, '');
-        this.pushMessageToChat(`${this.getPlayerNameById(message.senderId)}'s items :<br/>${items}`);
-
-        if (!this.isOwnMessage(message)) {
-          this.getPlayerById(message.senderId).inventory = inventory;
-        }
+        this.pushMessageToChat(`${this.getPlayerNameById(message.senderId)} updated inventory`);
+        this.updatePlayerInventory(message.senderId);
         break;
     }
   }
@@ -85,6 +79,13 @@ export class RoomSocketHolder extends AbstractWebSocketHolder {
       this.room.players.splice(pIndex, 1);
       this.playersPublisher.next(this.room.players);
     }
+  }
+
+  private updatePlayerInventory(updatedPlayerId: string) {
+    this.playerService.getPlayer(updatedPlayerId).subscribe(updatedPlayer => {
+      this.getPlayerById(updatedPlayer.id).inventory = updatedPlayer.inventory;
+      this.playersPublisher.next(this.room.players);
+    });
   }
 
   private pushMessageToChat(
