@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostListener, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../core/service/user.service';
 import {WsRoomMessageType} from '../../util/web-socket/ws-message-type';
@@ -75,7 +75,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   saveInventory(inventory: Inventory) {
     this.currentPlayer.inventory = inventory;
     this.playerService.updatePlayer(this.currentPlayer).subscribe(
-      () => this.roomSocketHolder.notifyAll({ type: WsRoomMessageType.INVENTORY, data: inventory }) // todo: pass player Id here
+      () => this.roomSocketHolder.notifyAll({ type: WsRoomMessageType.INVENTORY })
     );
   }
 
