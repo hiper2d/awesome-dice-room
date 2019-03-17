@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {AbstractService} from './abstract.service';
 import {Player} from '../../model/player';
-import {ApiConst} from '../../util/api.const';
+import {ApiConst} from '../../util/constant/api.const';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 

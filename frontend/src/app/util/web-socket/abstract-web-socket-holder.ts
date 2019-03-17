@@ -1,6 +1,5 @@
-import {WsMessage, WsMessageParam} from '../../model/ws-message';
-import {UserService} from '../../core/service/user.service';
-import {ApiConst} from '../api.const';
+import {WsMessageParam} from '../../model/ws-message';
+import {ApiConst} from '../constant/api.const';
 
 export abstract class AbstractWebSocketHolder {
 

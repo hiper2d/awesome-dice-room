@@ -7,8 +7,8 @@ import {DashboardModule} from './feature/dashboard/dashboard.module';
 import {CoreModule} from './core/core.module';
 import {PageNotFoundComponent} from './feature/page-not-found/page-not-found.component';
 import {BrowserModule} from '@angular/platform-browser';
-import {ApiConst} from './util/api.const';
 import {UserService} from './core/service/user.service';
+import {SystemConst} from './util/constant/system.const';
 
 @NgModule({
   declarations: [
@@ -37,7 +37,7 @@ export class AppModule {
 }
 
 export function loadToken(userService: UserService) {
-  return () => Promise.resolve(localStorage.getItem(ApiConst.LOCAL_STORAGE_TOKEN))
+  return () => Promise.resolve(localStorage.getItem(SystemConst.LOCAL_STORAGE_TOKEN))
     .then((t) => userService.storeToken(t))
     .catch(() => console.log('Unauthorized'));
 }

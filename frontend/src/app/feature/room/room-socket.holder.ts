@@ -1,5 +1,5 @@
 import {WsMessage, WsMessageParam} from '../../model/ws-message';
-import {WsRoomMessageType} from '../../util/web-socket/ws-message-type';
+import {WsRoomMessageType} from '../../util/web-socket/ws-message-type.enum';
 import {BehaviorSubject, Subject} from 'rxjs';
 import {Player} from '../../model/player';
 import {RoomMessage} from '../../model/room-message';

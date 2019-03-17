@@ -54,9 +54,15 @@ class AuthHandler @Autowired constructor(
             .filter { encoder.matches(token.password, it.password) }
             .switchIfEmpty(Mono.error(RuntimeException("Invalid credentials")))
 
-    private fun generateJwtToken(it: UserDetails): String =
-        Jwts.builder()
-            .setSubject(it.username)
+    private fun generateJwtToken(user: UserDetails): String {
+        val claims = Jwts.claims().apply {
+            subject = user.username
+            put("roles", user.authorities.map { it.authority })
+        }
+
+        return Jwts.builder()
+            .setClaims(claims)
             .signWith(SignatureAlgorithm.HS512, jwtConfig.secret)
             .compact()
+    }
 }
