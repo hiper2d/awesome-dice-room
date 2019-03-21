@@ -4,8 +4,8 @@
             <mat-icon aria-label="Add room">add</mat-icon>
         </button>
         <span>
-            <button *ngIf="userService.authenticated; else unauthorized" mat-fab color="primary" (click)="logout()" title="Exit">Exit</button>
-            <ng-template #unauthorized>
+            <button *ngIf="userService.authenticated; else unauthorizedTemplate" mat-fab color="primary" (click)="logout()" title="Exit">Exit</button>
+            <ng-template #unauthorizedTemplate>
                 <button mat-fab color="primary" (click)="login()" title="Login">
                     <mat-icon aria-label="Login">exit_to_app</mat-icon>
                 </button>
@@ -22,7 +22,7 @@
                 <button mat-icon-button color="primary" (click)="openRoom(room.id)">
                     <mat-icon>forward</mat-icon>
                 </button>
-                <button mat-icon-button (click)="removeRoom(room.id)" color="warn">
+                <button *ngIf="displayDeleteIcon()" mat-icon-button (click)="removeRoom(room.id)" color="warn">
                     <mat-icon>remove_circle</mat-icon>
                 </button>
             </div>

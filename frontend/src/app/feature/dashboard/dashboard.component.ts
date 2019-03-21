@@ -24,10 +24,10 @@ export class DashboardComponent extends AbstractWebSocketHolder implements OnIni
   rooms: Array<Room> = [];
 
   constructor(
+    public userService: UserService,
     public roomService: RoomService,
     private router: Router,
-    private dialog: MatDialog,
-    private userService: UserService
+    private dialog: MatDialog
   ) {
     super();
   }
@@ -73,6 +73,8 @@ export class DashboardComponent extends AbstractWebSocketHolder implements OnIni
   }
 
   openRoom = (roomId: string) => this.router.navigate(['/room', roomId]);
+
+  displayDeleteIcon = () => this.userService.isAdmin;
 
   private loadRooms() {
     this.roomService.allRooms().subscribe(rooms => {

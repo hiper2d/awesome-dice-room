@@ -8,6 +8,7 @@ import {tap} from 'rxjs/operators';
 import {Token} from '../../model/token';
 import {Generator} from '../../util/generator';
 import {SystemConst} from '../../util/constant/system.const';
+import {Roles} from '../../util/constant/role.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,9 @@ export class UserService extends AbstractService {
 
   authenticated = false;
   name = UserService.generateGustName();
-  roles = [];
+
+  private roles = [];
+  private _isAdmin = false;
 
   constructor(http: HttpClient) {
     super(http);
@@ -24,6 +27,10 @@ export class UserService extends AbstractService {
 
   private static generateGustName() {
     return 'Guest' + Generator.str(5);
+  }
+
+  get isAdmin(): boolean {
+    return this._isAdmin;
   }
 
   signUp(credentials: Credentials): Observable<any> {
@@ -43,6 +50,8 @@ export class UserService extends AbstractService {
   logout() {
     this.authenticated = false;
     this.name = UserService.generateGustName();
+    this.roles = [];
+    this._isAdmin = false;
     localStorage.removeItem(SystemConst.LOCAL_STORAGE_TOKEN);
   }
 
@@ -52,5 +61,6 @@ export class UserService extends AbstractService {
     this.authenticated = true;
     this.name = token.sub;
     this.roles = token.roles;
+    this._isAdmin = this.roles.indexOf(Roles.ADMIN) > -1;
   }
 }
