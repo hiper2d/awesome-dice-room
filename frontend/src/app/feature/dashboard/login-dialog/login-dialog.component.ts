@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, HostListener} from '@angular/core';
 import {AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, ValidatorFn, Validators} from '@angular/forms';
 import {ErrorStateMatcher, MatDialogRef} from '@angular/material';
 import {UserService} from '../../../core/service/user.service';
@@ -30,6 +30,13 @@ export class LoginDialogComponent {
       username: ['', [Validators.required, this.userAlreadyExistsValidator()]],
       password: ['', Validators.required]
     });
+  }
+
+  @HostListener('document:keydown.enter')
+  onKeyUp() {
+    if (this.loginForm.valid) {
+      this.onAccept();
+    }
   }
 
   private userAlreadyExistsValidator(): ValidatorFn {

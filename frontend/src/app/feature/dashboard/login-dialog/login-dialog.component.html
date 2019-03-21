@@ -1,4 +1,4 @@
-<form [formGroup]="loginForm">
+<form [formGroup]="loginForm" (keydown.enter)="$event.preventDefault()">
     <mat-form-field class="full-width">
         <input matInput placeholder="username" autocomplete="off" formControlName="username" [errorStateMatcher]="matcher" required autofocus (keydown)="onKeyDown()">
         <mat-error *ngIf="loginForm.get('username').hasError('invalid')">
@@ -11,7 +11,7 @@
     </mat-form-field>
 
     <div mat-dialog-actions>
-        <button mat-button (click)="onCancel()">Cancel</button>
+        <button mat-button (click)="onCancel()" >Cancel</button>
         <button mat-button (click)="onAccept()" [disabled]="!loginForm.valid">Login</button>
     </div>
 </form>
