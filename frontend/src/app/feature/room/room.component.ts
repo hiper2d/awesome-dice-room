@@ -89,9 +89,8 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
-  kick(kickedPlayerId: string, event: MouseEvent) {
+  kick(kickedPlayerId: string, event: any) {
     event.stopPropagation();
-    this.roomService.removePlayerFromRoom(this.room.id, kickedPlayerId).subscribe();
     this.roomSocketHolder.notifyAll({ type: WsRoomMessageType.KICK, data: kickedPlayerId });
   }
 
@@ -103,6 +102,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       tap(m => this.chatMessages.push(m)),
       tap(() => this.updateChatboxScrollPosition())
     ).subscribe();
+    this.roomSocketHolder.leaveEventObservable.subscribe(() => this.leaveRoom());
   }
 
   private calculateCurrentPlayerTabIndex() {

@@ -9,6 +9,9 @@ import {AbstractWebSocketHolder} from '../../util/web-socket/abstract-web-socket
 
 export class RoomSocketHolder extends AbstractWebSocketHolder {
 
+  private readonly leaveEventPublisher = new Subject<void>();
+  readonly leaveEventObservable = this.leaveEventPublisher.asObservable();
+
   private readonly messagePublisher = new Subject<RoomMessage>();
   readonly messageObservable = this.messagePublisher.asObservable();
 
@@ -50,6 +53,9 @@ export class RoomSocketHolder extends AbstractWebSocketHolder {
         break;
 
       case WsRoomMessageType.DISCONNECT:
+        if (message.senderId === this.currentPlayer.id) {
+          this.leaveEventPublisher.next();
+        }
         this.pushMessageToChat(`${this.getPlayerNameById(message.senderId)} disconnected`);
         this.removePlayerTab(this.getPlayerById(message.senderId));
         break;
@@ -61,12 +67,8 @@ export class RoomSocketHolder extends AbstractWebSocketHolder {
 
       case WsRoomMessageType.KICK:
         const kickedPlayerId = message.data;
-        const kickedPlayer = this.getPlayerById(kickedPlayerId);
         if (this.currentPlayer.id === kickedPlayerId) {
-          console.log('You were kicked'); // todo: make yourself leave the room
-        } else {
-          this.pushMessageToChat(`${kickedPlayer.name} was kicked`);
-          this.removePlayerTab(kickedPlayer);
+          this.leaveEventPublisher.next();
         }
         break;
     }

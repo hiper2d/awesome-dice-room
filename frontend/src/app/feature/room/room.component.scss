@@ -47,11 +47,11 @@
   mat-icon {
     margin-right: 10px;
 
-    &:before {
+    &.tab-icon:before {
       content: 'done'
     }
 
-    &.icon:hover:before {
+    &.admin-icon:hover:before {
       content: 'close';
       color: $red;
     }
