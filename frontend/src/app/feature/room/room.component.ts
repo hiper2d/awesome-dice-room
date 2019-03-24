@@ -89,6 +89,14 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
+  kick(kickedPlayerId: string, event: MouseEvent) {
+    event.stopPropagation();
+    this.roomService.removePlayerFromRoom(this.room.id, kickedPlayerId).subscribe();
+    this.roomSocketHolder.notifyAll({ type: WsRoomMessageType.KICK, data: kickedPlayerId });
+  }
+
+  isAdminPlayer = (player: Player) => this.userService.isAdmin && player.id !== this.currentPlayer.id;
+
   private createAndSetupWsHandler() {
     this.roomSocketHolder = new RoomSocketHolder(this.room, this.currentPlayer, this.playerService);
     this.roomSocketHolder.messageObservable.pipe(

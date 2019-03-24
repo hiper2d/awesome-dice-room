@@ -58,6 +58,17 @@ export class RoomSocketHolder extends AbstractWebSocketHolder {
         this.pushMessageToChat(`${this.getPlayerNameById(message.senderId)} updated inventory`);
         this.updatePlayerInventory(message.senderId);
         break;
+
+      case WsRoomMessageType.KICK:
+        const kickedPlayerId = message.data;
+        const kickedPlayer = this.getPlayerById(kickedPlayerId);
+        if (this.currentPlayer.id === kickedPlayerId) {
+          console.log('You were kicked'); // todo: make yourself leave the room
+        } else {
+          this.pushMessageToChat(`${kickedPlayer.name} was kicked`);
+          this.removePlayerTab(kickedPlayer);
+        }
+        break;
     }
   }
 

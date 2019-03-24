@@ -1,9 +1,10 @@
 export enum WsRoomMessageType {
-  ROLL = 'ROLL',
-  HI_I_AM_NEW_HERE = 'HI_I_AM_NEW_HERE',
   CHAT_MESSAGE = 'CHAT_MESSAGE',
   DISCONNECT = 'DISCONNECT',
-  INVENTORY = 'INVENTORY'
+  HI_I_AM_NEW_HERE = 'HI_I_AM_NEW_HERE',
+  KICK = 'KICK',
+  INVENTORY = 'INVENTORY',
+  ROLL = 'ROLL'
 }
 
 export enum WsDashboardMessageType {
