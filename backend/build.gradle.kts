@@ -1,3 +1,4 @@
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
@@ -5,11 +6,13 @@ plugins {
     val kotlinVersion = "1.3.21"
     val springBootVersion = "2.1.3.RELEASE"
     val springDependencyManagementVersion = "1.0.6.RELEASE"
+    val dockerPlugin = "4.1.0"
 
     kotlin("jvm") version kotlinVersion
     id("io.spring.dependency-management") version springDependencyManagementVersion
     id("org.springframework.boot") version springBootVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
+    id("com.bmuschko.docker-remote-api") version dockerPlugin
 }
 
 val activationVersion: String by project
@@ -58,4 +61,11 @@ tasks {
     withType<BootJar> {
         mainClassName = "com.hiper2d.ApplicationKt"
     }
+
+    create<DockerBuildImage>("buildDockerImage") {
+        inputDir.set(file("."))
+        tag.set("hiper2d/dice-room-backend:latest")
+    }
+
+    get("build").finalizedBy("buildDockerImage")
 }
