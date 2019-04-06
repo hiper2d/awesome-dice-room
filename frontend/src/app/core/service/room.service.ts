@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {AbstractService} from './abstract.service';
 import {Observable} from 'rxjs';
 import {Room} from '../../model/room';
-import {ApiConst} from '../../util/api.const';
+import {ApiConst} from '../../util/constant/api.const';
 import {RoomFull} from '../../model/room-rull';
 
 @Injectable({

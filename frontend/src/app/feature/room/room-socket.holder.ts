@@ -1,5 +1,5 @@
 import {WsMessage, WsMessageParam} from '../../model/ws-message';
-import {WsRoomMessageType} from '../../util/web-socket/ws-message-type';
+import {WsRoomMessageType} from '../../util/web-socket/ws-message-type.enum';
 import {BehaviorSubject, Subject} from 'rxjs';
 import {Player} from '../../model/player';
 import {RoomMessage} from '../../model/room-message';
@@ -8,6 +8,9 @@ import {RoomFull} from '../../model/room-rull';
 import {AbstractWebSocketHolder} from '../../util/web-socket/abstract-web-socket-holder';
 
 export class RoomSocketHolder extends AbstractWebSocketHolder {
+
+  private readonly leaveEventPublisher = new Subject<void>();
+  readonly leaveEventObservable = this.leaveEventPublisher.asObservable();
 
   private readonly messagePublisher = new Subject<RoomMessage>();
   readonly messageObservable = this.messagePublisher.asObservable();
@@ -50,6 +53,9 @@ export class RoomSocketHolder extends AbstractWebSocketHolder {
         break;
 
       case WsRoomMessageType.DISCONNECT:
+        if (message.senderId === this.currentPlayer.id) {
+          this.leaveEventPublisher.next();
+        }
         this.pushMessageToChat(`${this.getPlayerNameById(message.senderId)} disconnected`);
         this.removePlayerTab(this.getPlayerById(message.senderId));
         break;
@@ -57,6 +63,13 @@ export class RoomSocketHolder extends AbstractWebSocketHolder {
       case WsRoomMessageType.INVENTORY:
         this.pushMessageToChat(`${this.getPlayerNameById(message.senderId)} updated inventory`);
         this.updatePlayerInventory(message.senderId);
+        break;
+
+      case WsRoomMessageType.KICK:
+        const kickedPlayerId = message.data;
+        if (this.currentPlayer.id === kickedPlayerId) {
+          this.leaveEventPublisher.next();
+        }
         break;
     }
   }

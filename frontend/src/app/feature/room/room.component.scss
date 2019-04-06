@@ -1,3 +1,5 @@
+@import "../../../assets/style/theme";
+
 :host {
   min-height: 100%;
 }
@@ -44,6 +46,15 @@
 
   mat-icon {
     margin-right: 10px;
+
+    &.tab-icon:before {
+      content: 'done'
+    }
+
+    &.admin-icon:hover:before {
+      content: 'close';
+      color: $red;
+    }
   }
 
   .tab-body {

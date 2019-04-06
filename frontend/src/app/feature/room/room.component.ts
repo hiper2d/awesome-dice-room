@@ -1,11 +1,11 @@
 import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {UserService} from '../../core/service/user.service';
-import {WsRoomMessageType} from '../../util/web-socket/ws-message-type';
+import {WsRoomMessageType} from '../../util/web-socket/ws-message-type.enum';
 import {Player} from '../../model/player';
 import {Inventory} from '../../model/inventory';
 import {RoomService} from '../../core/service/room.service';
-import {ApiConst} from '../../util/api.const';
+import {ApiConst} from '../../util/constant/api.const';
 import {PlayerService} from '../../core/service/player.service';
 import {Queue} from '../../util/queue';
 import {RoomMessage} from '../../model/room-message';
@@ -89,12 +89,20 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
+  kick(kickedPlayerId: string, event: any) {
+    event.stopPropagation();
+    this.roomSocketHolder.notifyAll({ type: WsRoomMessageType.KICK, data: kickedPlayerId });
+  }
+
+  isAdminPlayer = (player: Player) => this.userService.isAdmin && player.id !== this.currentPlayer.id;
+
   private createAndSetupWsHandler() {
     this.roomSocketHolder = new RoomSocketHolder(this.room, this.currentPlayer, this.playerService);
     this.roomSocketHolder.messageObservable.pipe(
       tap(m => this.chatMessages.push(m)),
       tap(() => this.updateChatboxScrollPosition())
     ).subscribe();
+    this.roomSocketHolder.leaveEventObservable.subscribe(() => this.leaveRoom());
   }
 
   private calculateCurrentPlayerTabIndex() {

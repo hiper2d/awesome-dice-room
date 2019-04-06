@@ -1,9 +1,10 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {RoomComponent} from './room.component';
+import {RoomEnteringGuard} from '../../core/guard/room-entering.guard';
 
 const routes: Routes = [
-  { path: 'room/:roomId', component: RoomComponent },
+  { path: 'room/:roomId', canActivate: [ RoomEnteringGuard ], component: RoomComponent },
 ];
 
 @NgModule({

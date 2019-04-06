@@ -22,13 +22,24 @@
   <mat-tab-group [selectedIndex]="currentPlayerTabIndex">
     <mat-tab *ngFor="let player of roomSocketHolder?.playersObservable | async" [label]="player.name">
         <ng-template mat-tab-label>
-            <mat-icon color="primary">done</mat-icon>
+            <ng-container [ngTemplateOutlet]="isAdminPlayer(player) ? adminIcon : userIcon"
+                          [ngTemplateOutletContext]="{ id: player.id }">
+            </ng-container>
             <span class="tab-header-text">{{ player.name }}</span>
         </ng-template>
         <div class="tab-body">
             <player-seat [player]="player" [readonly]="player.id !== currentPlayer?.id"
-                         (saveInventory)="saveInventory($event)"></player-seat>
+                         (saveInventory)="saveInventory($event)">
+            </player-seat>
         </div>
     </mat-tab>
   </mat-tab-group>
 </div>
+
+<ng-template let-id="id" #adminIcon>
+    <mat-icon color="primary" class="tab-icon admin-icon" (click)="kick(id, $event)"></mat-icon>
+</ng-template>
+
+<ng-template #userIcon>
+    <mat-icon color="primary" class="tab-icon"></mat-icon>
+</ng-template>

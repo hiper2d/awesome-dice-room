@@ -3,11 +3,11 @@ import {Router} from '@angular/router';
 import {RoomService} from '../../core/service/room.service';
 import {AbstractWebSocketHolder} from '../../util/web-socket/abstract-web-socket-holder';
 import {WsMessage} from '../../model/ws-message';
-import {WsDashboardMessageType} from '../../util/web-socket/ws-message-type';
+import {WsDashboardMessageType} from '../../util/web-socket/ws-message-type.enum';
 import {UserService} from '../../core/service/user.service';
 import {Room} from '../../model/room';
 import {filter, flatMap} from 'rxjs/operators';
-import {ApiConst} from '../../util/api.const';
+import {ApiConst} from '../../util/constant/api.const';
 import {MatDialog} from '@angular/material';
 import {NewRoomDialogComponent} from './new-room-dialog/new-room-dialog.component';
 import {LoginDialogComponent} from './login-dialog/login-dialog.component';
@@ -24,10 +24,10 @@ export class DashboardComponent extends AbstractWebSocketHolder implements OnIni
   rooms: Array<Room> = [];
 
   constructor(
+    public userService: UserService,
     public roomService: RoomService,
     private router: Router,
-    private dialog: MatDialog,
-    private userService: UserService
+    private dialog: MatDialog
   ) {
     super();
   }
@@ -73,6 +73,8 @@ export class DashboardComponent extends AbstractWebSocketHolder implements OnIni
   }
 
   openRoom = (roomId: string) => this.router.navigate(['/room', roomId]);
+
+  displayDeleteIcon = () => this.userService.isAdmin;
 
   private loadRooms() {
     this.roomService.allRooms().subscribe(rooms => {

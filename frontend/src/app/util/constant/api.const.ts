@@ -5,7 +5,8 @@ export class ApiConst {
   static readonly API_SIGN_UP = '/api/signup';
   static readonly API_TOKEN = '/api/token';
 
-  static readonly LOCAL_STORAGE_TOKEN = 'auth_token';
+  static readonly HEADER_AUTH = 'Authorization';
+  static readonly HEADER_AUTH_PREFIX = 'bearer';
 
   static readonly WS_HOST = `ws://${window.location.hostname}:8080/ws`;
   static readonly WS_DASHBOARD = 'dashboard';
