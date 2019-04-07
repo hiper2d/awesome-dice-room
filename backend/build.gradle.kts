@@ -4,23 +4,21 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     val kotlinVersion = "1.3.21"
-    val springBootVersion = "2.1.3.RELEASE"
+    val springBootVersion = "2.1.4.RELEASE"
     val springDependencyManagementVersion = "1.0.6.RELEASE"
-    val dockerPlugin = "4.1.0"
 
     kotlin("jvm") version kotlinVersion
     id("io.spring.dependency-management") version springDependencyManagementVersion
     id("org.springframework.boot") version springBootVersion
     id("org.jetbrains.kotlin.plugin.spring") version kotlinVersion
-    id("com.bmuschko.docker-remote-api") version dockerPlugin
 }
 
-val activationVersion: String by project
-val disruptorVersion: String by project
-val jaxbVersion: String by project
-val kotlinJacksonVersion: String by project
-val junitJupiterVersion: String by project
-val jjwtVersion: String = "0.9.+"
+val activationVersion = "1.1.1"
+val disruptorVersion = "3.4.2"
+val jaxbVersion = "2.3.0"
+val kotlinJacksonVersion = "2.9.+"
+val junitJupiterVersion = "5.3.+"
+val jjwtVersion = "0.9.+"
 
 repositories {
     jcenter()
@@ -64,8 +62,6 @@ tasks {
 
     create<DockerBuildImage>("buildDockerImage") {
         inputDir.set(file("."))
-        tag.set("hiper2d/dice-room-backend:latest")
+        tags.add("hiper2d/dice-room-backend:latest")
     }
-
-    get("build").finalizedBy("buildDockerImage")
 }
