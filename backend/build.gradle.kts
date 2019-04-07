@@ -36,6 +36,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
 
+    // These libs are required by Java 11 to avoid java.lang.NoClassDefFoundError: javax/xml/bind/DatatypeConverter
+    implementation("javax.xml.bind:jaxb-api:$jaxbVersion")
+    implementation("com.sun.xml.bind:jaxb-core:$jaxbVersion")
+    implementation("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
+
     testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit")

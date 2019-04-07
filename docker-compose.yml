@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  mongo:
+    image: mongo:3.4.19-jessie
+    container_name: awesome-mongo
+    network_mode: host
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./database/data/db:/data/db
+
+  backend:
+    build: ./backend
+    image: hiper2d/awesome-dice-backend
+    container_name: awesome-backend
+    depends_on:
+      - mongo
+    network_mode: host
+    ports:
+      - "8080:8080"
