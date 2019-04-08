@@ -28,8 +28,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   chatMessage = '';
   currentPlayer: Player;
   room: RoomFull;
-
-  private currentPlayerTabIndex = 0;
+  currentPlayerTabIndex = 0;
 
   constructor(
     private roomService: RoomService,
