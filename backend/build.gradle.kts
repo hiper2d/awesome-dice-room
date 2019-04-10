@@ -65,7 +65,7 @@ tasks {
         mainClassName = "com.hiper2d.ApplicationKt"
     }
 
-    create<DockerBuildImage>("buildDockerImage") {
+    create<DockerBuildImage>("docker") {
         inputDir.set(file("."))
         tags.add("hiper2d/dice-room-backend:latest")
     }
