@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  mongo:
+    image: mongo:3.4.19-jessie
+    container_name: awesome-mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - ./database/data/db:/data/db

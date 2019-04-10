@@ -1,13 +1,12 @@
 jwt:
   header: Authorization
-  param: token
   secret: awesome
-  expiration: 604800000
   prefix: bearer
-  route:
-    authentication:
-      path: auth
-      token: token
-      refresh: refresh
 
-spring.data.mongodb.uri: mongodb://localhost:27017/test
+spring.data.mongodb.uri: mongodb://awesome-mongo:27017/test
+
+---
+spring:
+  profiles: local
+
+  data.mongodb.uri: mongodb://localhost:27017/test

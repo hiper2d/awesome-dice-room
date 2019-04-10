@@ -4,7 +4,8 @@ services:
   mongo:
     image: mongo:3.4.19-jessie
     container_name: awesome-mongo
-    network_mode: host
+    ports:
+      - 27017:27017
     volumes:
       - ./database/data/db:/data/db
 
@@ -12,14 +13,19 @@ services:
     build: ./backend
     image: hiper2d/awesome-dice-backend
     container_name: awesome-backend
-    depends_on:
-      - mongo
-    network_mode: host
+    ports:
+      - 8080:8080
     volumes:
       - ./logs:/logs
+    entrypoint: /opt/backend/bin/entrypoint.sh
+    depends_on:
+      - mongo
 
   frontend:
     build: ./frontend
     image: hiper2d/awesome-dice-frontend
     container_name: awesome-frontend
-    network_mode: host
+    ports:
+      - 80:80
+    depends_on:
+      - backend
