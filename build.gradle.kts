@@ -11,5 +11,5 @@ subprojects {
         plugin("com.bmuschko.docker-remote-api")
     }
 
-    tasks["build"].finalizedBy("buildDockerImage")
+    // tasks["build"].finalizedBy("buildDockerImage")
 }
