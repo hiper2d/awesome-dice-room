@@ -7,9 +7,6 @@ subprojects {
     version = "1.0"
 
     apply {
-        plugin("org.gradle.base")
         plugin("com.bmuschko.docker-remote-api")
     }
-
-    // tasks["build"].finalizedBy("buildDockerImage")
 }

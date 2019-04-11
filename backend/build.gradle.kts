@@ -1,6 +1,7 @@
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
     val kotlinVersion = "1.3.21"
@@ -57,16 +58,22 @@ configurations.all {
 tasks {
     withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "1.8"
+            jvmTarget = JavaVersion.VERSION_1_8.toString()
         }
     }
 
-    withType<BootJar> {
-        mainClassName = "com.hiper2d.ApplicationKt"
+    getByName<BootRun>("bootRun") {
+        main = "com.hiper2d.ApplicationKt"
+        args = mutableListOf("--spring.profiles.active=local")
     }
 
     create<DockerBuildImage>("docker") {
         inputDir.set(file("."))
         tags.add("hiper2d/dice-room-backend:latest")
+        dependsOn(getByName("build"))
+    }
+
+    named<Delete>("clean") {
+        delete("out")
     }
 }
