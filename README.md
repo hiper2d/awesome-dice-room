@@ -3,7 +3,7 @@ Awesome dice room
 
 This is a web site for helping me and my friends to play D&D like games. It allows a Game Master and players to roll dice, play tokens, chips, cards, whatever on a virtual table.
 
-The project consists of two applications (for now at least): the Angular frontend, and the reactive Spring/Kotlin backend. I use WebSockets for the real time interaction. In my plans to add MongoDb with the REST backend-frontend communication for saving a playing room state, a stateless Spring Security logic based on JWT for distinguishing user roles, Docker and deploy this all to AWS.
+The project consists of two applications (for now at least): the Angular frontend, and the reactive Spring/Kotlin backend. I use WebSockets for the real time interaction between users. There are a MongoDb with reactive repositories, JWS based authorization model without sessions, Docker containers, Gradle modules with Kotlin Script and other cool things. The nearest plans are deploying this all to AWS.
 
 I've just started so not much things has been done yet. The design is raw and ugly, I hope to come up with something better in future.
 
@@ -11,7 +11,7 @@ I've just started so not much things has been done yet. The design is raw and ug
 
 ![room](https://raw.githubusercontent.com/hiper2d/awesome-dice-room/master/doc/room3.png)
 
-##### Technology stack
+### Technology stack
 * Spring Framework 5 with Webflux/Reactor and Netty server
 * Spring Boot 2.0
 * Reactive WebSockets
@@ -19,7 +19,7 @@ I've just started so not much things has been done yet. The design is raw and ug
 * Angular 7
 * Gradle 5 with Kotlin Script and jUnit 5
 
-##### How to run
+### How to run
 
 ###### Using Docker Compose
 
@@ -41,7 +41,7 @@ I've just started so not much things has been done yet. The design is raw and ug
     
     It's possible to run a locally installed Mongo client with the database from the `database/data/db directory`. The backend application expects it to be run on the default `27017` port
        
-2. Build and run the backend application with the 'local' Spring profile:
+2. Build and run the backend application with the `local` Spring profile:
 
        ./gradlew backend:{clean,build,bootRun}
 
@@ -54,7 +54,7 @@ I've just started so not much things has been done yet. The design is raw and ug
        
    Check that it's running at http://localhost:4200
 
-##### Requirements
+### Prerequisites
 * JRE/JDK 8+
 * NodeJS
 * Yarn
