@@ -54,7 +54,10 @@ export class RoomComponent implements OnInit, OnDestroy {
       })
     ).subscribe(
       () => this.roomSocketHolder.connect(`${ApiConst.WS_ROOM}/${this.room.id}`),
-      () => this.leaveRoom()
+      () => {
+        console.log('Cannot connect to room socket');
+        this.leaveRoom();
+      }
     );
   }
 
