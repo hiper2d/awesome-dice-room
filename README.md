@@ -47,9 +47,13 @@ I've just started so not much things has been done yet. The design is raw and ug
 
     Check that it's running at http://localhost:8080/api/rooms
 
-3. Run the frontend application on the dev webpack server:
+3. Navigate to the fronted dir and install javascript libraries:
 
         cd frontend
+        yarn install
+
+4. Run the frontend application on the dev webpack server:
+
         yarn start
        
    Check that it's running at http://localhost:4200
