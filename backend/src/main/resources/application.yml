@@ -8,5 +8,9 @@ spring.data.mongodb.uri: mongodb://awesome-mongo:27017/test
 ---
 spring:
   profiles: local
-
   data.mongodb.uri: mongodb://localhost:27017/test
+
+---
+spring:
+  profiles: atlas
+  data.mongodb.uri: mongodb+srv://hiper2d:${mongo-pass}@cluster0-l2yiy.mongodb.net/test?retryWrites=true
