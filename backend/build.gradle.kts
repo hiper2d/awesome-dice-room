@@ -4,8 +4,8 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
-    val kotlinVersion = "1.3.21"
-    val springBootVersion = "2.1.4.RELEASE"
+    val kotlinVersion = "1.3.31"
+    val springBootVersion = "2.1.5.RELEASE"
     val springDependencyManagementVersion = "1.0.6.RELEASE"
 
     kotlin("jvm") version kotlinVersion
