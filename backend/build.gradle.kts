@@ -73,6 +73,13 @@ tasks {
         dependsOn(getByName("build"))
     }
 
+    create<DockerBuildImage>("docker-atlas") {
+        dockerFile.set(file("./Dockerfile.atlas"))
+        inputDir.set(file("."))
+        tags.add("hiper2d/dice-room-backend-atlas:latest")
+        dependsOn(getByName("build"))
+    }
+
     named<Delete>("clean") {
         delete("out")
     }
