@@ -21,7 +21,7 @@ import {RoomSocketHolder} from './room-socket.holder';
 })
 export class RoomComponent implements OnInit, OnDestroy {
 
-  @ViewChild('chatbox') chatbox: ElementRef;
+  @ViewChild('chatbox', { static: true }) chatbox: ElementRef;
   chatMessages: Queue<RoomMessage> = new Queue(100);
   roomSocketHolder: RoomSocketHolder;
 
