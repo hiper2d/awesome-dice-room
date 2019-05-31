@@ -16,7 +16,7 @@ I've just started so not much things has been done yet. The design is raw and ug
 * Spring Boot 2.0
 * Reactive WebSockets
 * Kotlin 1.3
-* Angular 7
+* Angular 8
 * Gradle 5 with Kotlin Script and jUnit 5
 
 ### How to run
@@ -54,7 +54,7 @@ I've just started so not much things has been done yet. The design is raw and ug
 
 4. Run the frontend application on the dev webpack server:
 
-        yarn start
+        ng serve
        
    Check that it's running at http://localhost:4200
 
