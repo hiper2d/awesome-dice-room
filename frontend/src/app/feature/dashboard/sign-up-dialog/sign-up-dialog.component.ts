@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from '@angular/forms';
-import {ErrorStateMatcher, MatDialogRef} from '@angular/material';
+import { ErrorStateMatcher } from '@angular/material/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import {UserService} from '../../../core/service/user.service';
 
 class EmailErrorStateMatcher implements ErrorStateMatcher {

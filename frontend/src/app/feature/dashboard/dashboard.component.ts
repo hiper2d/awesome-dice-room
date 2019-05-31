@@ -8,7 +8,7 @@ import {UserService} from '../../core/service/user.service';
 import {Room} from '../../model/room';
 import {filter, flatMap} from 'rxjs/operators';
 import {ApiConst} from '../../util/constant/api.const';
-import {MatDialog} from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import {NewRoomDialogComponent} from './new-room-dialog/new-room-dialog.component';
 import {LoginDialogComponent} from './login-dialog/login-dialog.component';
 import {SignUpDialogComponent} from './sign-up-dialog/sign-up-dialog.component';
