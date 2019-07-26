@@ -1,5 +1,5 @@
 plugins {
-    id("com.bmuschko.docker-remote-api") version "4.6.2" apply false
+    id("com.bmuschko.docker-remote-api") version "4.10.0" apply false
 }
 
 subprojects {
